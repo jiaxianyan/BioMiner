@@ -1,4 +1,14 @@
 # BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature
+
+## Changelog
+- 2025/12/27 BioMiner Upgrade Version Release
+    - **Biotriplet Extraction F1 score increases to 0.32**
+    - Open-weight OCSR Model **MolGlyph** 
+    - Open-weight MLLM Model **BioMiner-Instruct**
+
+- 2025/4/23 BioMiner Initial Version Release
+    - Biotriplet Extraction F1 score 0.22
+
 ## Introduction
 This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v1).
 If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
@@ -15,7 +25,7 @@ If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
 ![BioMiner_and_BioVista](visualization/framework_new.png)
 
 ### BioMiner's Performance on BioVista
-BioMiner achieves recall rates of 0.24, 0.44, and 0.58 for bioactivity triplet (protein-SMILES-bioactivity value), chemical structures (ligand coreference-SMIELS), and bioactivity measurement (protein-ligand coreference-bioactivity value), respectively. **Notably, its Markush enumeration capability achieves an F1 score of 0.56.**
+BioMiner achieves recall rates of 0.32 for bioactivity triplet (protein-SMILES-bioactivity value). **Notably, its Markush enumeration capability achieves an F1 score of 0.70.**
 More detailed analysis result are shown in the figure.
 
 ![BioVista_Performance](visualization/benchmark_new.png)
@@ -47,7 +57,7 @@ Downloading BioVista according to the following links, and unzip them in the `./
 |  Bioactivity Triplet Extraction | F1, Precision, Recall | 500 Papers | 16,457 bioactivity | [Link](https://drive.google.com/file/d/1xITA_Mub9u1MCZjlgs26qL_dMCrzS9Rn/view?usp=drive_link) | 
 |  Structure-Bioactivity Annotation | Recall@N | 500 structure-paper pairs |  500 structure-bioactivity pairs | [Link](https://drive.google.com/file/d/1cLC3NePtxctIurnCVaNLw0JzBWYrWTVW/view?usp=drive_link) | 
 |  Molecule Detection | Average Precision | 500 Papers | 11,212 boundary boxes  | [Link](https://drive.google.com/file/d/1SvsdgrizDqg5V-MGXEPGMmu4JmmhiFae/view?usp=drive_link) | 
-|  OCSR | Accuracy | 8,861 2D molecule structure depictions | 8,861 SMILES  | [Link](https://drive.google.com/file/d/11iCH0j7U9iFgwXahjkWZouNyqATfEPoL/view?usp=drive_link) | 
+|  OCSR | precision | 8,861 2D molecule structure depictions | 8,861 SMILES  | [Link](https://drive.google.com/file/d/11iCH0j7U9iFgwXahjkWZouNyqATfEPoL/view?usp=drive_link) | 
 |  Full Structure Coreference Recognition | F1, Precision, Recall | 962 Augmented Images | 5,105 full structure-coreference pairs | [Link](https://drive.google.com/file/d/14_BREaWgJOIjgVAkCEMwbXKRKsmqpTgu/view?usp=drive_link) | 
 |  Markush Enumeration | F1, Precision, Recall | 355 Augmented Images | 3,513 Markush Scaffold-R Group-Coreference Pairs | [Link](https://drive.google.com/file/d/19WrleiHQY6v6srZEWlKvl-uPlx0wiaLa/view?usp=drive_link) | 
 
@@ -65,50 +75,38 @@ You can directly download them for your own use.
 
 ## Installation of BioMiner
 
-BioMiner integrates MLLMs (Gemini-2.0-flash), DSMs (MinerU, MolMiner, MolParser), and DTs (RDKit, OPSIN) together to acheive the best performance.
-Among then, MolMiner and MolParser provide platform and website, while they have not released their source codes. In our experiments, we connect their authors to achieve the batch result.
+BioMiner coordinates MLLMs (BioMiner-Instruct), DSMs (MolDetv2, MolGlyph), and DTs (RDKit, OPSIN) together. All of them are open-weight models. 
 
-Here, we provide **two version of BioMiner**, and introduce their installation and usage:
-- (i) the **best performance version**, using MolMiner and MolParser for molecule detection and OCSR
-- (ii) the **completely open-source version**, using [MolDet](https://huggingface.co/AI4Industry/MolDet) and MolScribe for molecule detection and OCSR
+- MolDetV2, available in [HuggingFace](https://huggingface.co/UniParser/MolDetv2)
+- MolGlyph, available in [HuggingFace]()
+- BioMiner-Instruct, available in [HuggingFace]()
 
-:tada: **After communicating with the authors of MolParser, they will release the code in the short future**
-
-**Note 1:** As shown in the following table, the open-source MolScribe cannot predict markush structures well, so the open-source version BioMiner thus tends to process Markush structures incorrectly. 
-
-**Note 2:** We have provided the inference result of MolParser on BioVista for result reproduction
-
-**Note 3:** We have trained a Markush-augmented version of MolScribe, and you can download it from [checkpoint](https://drive.google.com/file/d/1FkkPCqPfwPAqkTcGum-IYYBBCwQ_1xWj/view?usp=sharing).
-
-**Note 4:** Besides waiting the release of MolParser, we are also developing our own open-source OCSR model [**MolGlyph**](https://github.com/jiaxianyan/MolGlyph). It is an independent project beyond BioMiner, and we will try to release it in this month (~~2025.06~~ 2025.07)
-
-We choose the MLLM, molecule detection and OCSR models based on their performance on BioVista:
+Performance of these models on BioVista:
 
 - Molecule Detection Performance:
 
-|Metrics | YOLO | MolDet | MolMiner  | **BioMiner** |
+|Metrics | YOLO | MolDet | MolMiner  | **MolDetV2** |
 | ----------- | ----------- | ----------- | ----------- | ----------- | 
-|mAP | 0.648 | 0.778 | **0.878** |  0.857 |
-|AP50 | 0.846 | 0.910 | 0.899 | **0.929** |
-|AP75 | 0.752 | 0.851 | 0.876 |  **0.892** |
-|AP-Small | 0.000 | 0.034 | 0.000 |  **0.185** |
-|AP-Large | 0.720 | 0.846 | **0.932** | 0.922 |
+|mAP | 0.648 | 0.778 | **0.878** |  0.747 |
+|AP50 | 0.846 | 0.910 | 0.899 | **0.922** |
+|AP75 | 0.752 | 0.851 | **0.876** |  0.851 |
+|AP-Small | 0.000 | 0.034 | 0.000 |  **0.050** |
 
 - OCSR Performance:
 
-Structure Types | MolMiner | MolScribe | MolNexTR | DECIMER | **MolScribe (Ours)** |**MolParser** |
-| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-Full | **0.774** | 0.703 | 0.695 | 0.545 | 0.633 | 0.669 |
-Chiral | 0.497 | 0.481 | 0.419 | 0.326 | **0.530** | 0.352 |
-Markush | 0.185 | 0.156 | 0.045 | 0.000 | 0.635 | **0.733**|
-All | 0.507 | 0.455 | 0.401 | 0.298 | 0.634 | **0.703** |
+Structure Types | MolMiner | MolScribe | MolNexTR | DECIMER | **MolScribe (Ours)** |**MolParser** | **MolGlyph (Ours)** |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+Full | **0.774** | 0.703 | 0.695 | 0.545 | 0.633 | 0.669 | 0.758 |
+Chiral | 0.497 | 0.481 | 0.419 | 0.326 | **0.530** | 0.352 | 0.504 |
+Markush | 0.185 | 0.156 | 0.045 | 0.000 | 0.635 | 0.733| **0.770** |
+All | 0.507 | 0.455 | 0.401 | 0.298 | 0.634 | 0.703 | **0.764** |
 
 - MLLM performance on MLLM-related tasks:
 
 ![BioVista_Performance](visualization/table_1.png)
 
 
-### The Best Performance Version
+### Running Installation
 
 We provide two ways to install this version.
 
@@ -141,7 +139,7 @@ magic-pdf -p small_ocr.pdf -o ./output
 
 #### 2. Install from yaml file
 ```
-conda env create -f environment.yml
+conda env create -f upgrade_environment.yml
 conda activate BioMiner
 
 # Install MinerU. 
@@ -161,37 +159,21 @@ python download_models.py
 magic-pdf -p small_ocr.pdf -o ./output
 ```
 
-### The Completely Open-source Version
-
-Due to the package version conflicts between MolScribe and MinerU, we create two conda environments. Therefore, we construct an additional conda environment:
-```
-conda create -y -n BioMiner_MolScribe python=3.7
-conda activate BioMiner_MolScribe
-bash ./scripts/conda_molscribe.sh
-```
-
-**Option 1**: Download the MolScribe [checkpoint](https://drive.google.com/file/d/1d_hJIHBVzc1aFbPjBndH6BvLkBlpCvMk/view?usp=sharing) to the path `BioMiner/MolScribe/ckpts/swin_base_char_aux_1m680k.pth`.
-
-**Option 2 (Recommended)**: Download **our Markush-augmented version** of MolScribe [checkpoint](https://drive.google.com/file/d/1FkkPCqPfwPAqkTcGum-IYYBBCwQ_1xWj/view?usp=sharing) to the path `BioMiner/MolScribe/ckpts/swin_base_char_aux_1m680k.pth`.
-
 
 ## Usage of BioMiner
 
-MLLM Gemini-2.0-flash is employed in BioMiner, first you should config the `api_key` and `base_url` in config file `BioMiner/config/default.yaml` for calling MLLM.
-
+MLLM BioMiner-Instruct is employed in BioMiner, first you should config the `api_key` and `base_url` in config file `BioMiner/config/default.yaml` for calling MLLM.
 
 Due to the copyright of papers, here, we only take two open access papers as an example to show the usage:
-
-### The Best Performance Version
 
 Activating the BioMiner environment
 ```
 conda activate BioMiner
 ```
 
-#### Input a pdf file
+### Input a pdf file
 ```
-python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf --external_full_md_res_dir=example/full_md_molminer --external_ocsr_res_dir=example/ocsr_molparser 
+python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf --external_full_md_res_dir=example/full_md_molminer --external_ocsr_res_dir=example/ocsr_molparser 
 ```
 **Output (Top-10 lines)**:
 ```
@@ -210,20 +192,11 @@ python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs
 ...
 ```
 
-#### Input a directory contains pdfs
+### Input a directory contains pdfs
 ```
-python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs --external_full_md_res_dir=example/full_md_molminer --external_ocsr_res_dir=example/ocsr_molparser
+python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs 
 ```
 
-### The Completely Open-source Version
-
-```
-conda activate BioMiner
-python3 example_open_source_one.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs/40_6s8a.pdf
-
-conda activate BioMiner_MolScribe
-python3 example_open_source_two.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs/40_6s8a.pdf 
-```
 
 ### Parameter Descriptor
 
@@ -232,10 +205,6 @@ Both two version takes the following input:
 - **pdf**, the path of the pdf file or the pdf directory. 
 - **biovista_evaluate**, if the pdfs are in biovista (have labels), enable biovista evaluation
 
-For the best performance version, two additional parameters are needed to specify the result path of external models (MolMiner and MolParser)
-- **external_full_md_res_dir**, the reuslt of external molecule detection models, we use MolMiner to get the best performance
-- **external_ocsr_res_dir**, the reuslt of external OCSR models, we use MolParser to get the best performance
-
 ## Evaluation on BioVista and Result Reproducation
 
 ### Evaluation of Two End-to-end Tasks:
@@ -243,69 +212,79 @@ For the best performance version, two additional parameters are needed to specif
 - 2. Downloading the six BioVista dataset, and unzip in the `BioVista` directory
 - 3. Adding `--biovista_evaluate` in the command line, running:
 ```
-python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs --external_full_md_res_dir=example/full_md_molminer --external_ocsr_res_dir=example/ocsr_molparser --biovista_evaluate
+python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs --biovista_evaluate
 ```
 
 **Output**:
 ```
-Average recall_text_bioactivity_list: 0.44089748472539764
-Average precision_text_bioactivity_list: 0.2915082483001802
-Average recall_figure_bioactivity_list: 0.5778217101752532
-Average precision_figure_bioactivity_list: 0.2748664603406172
-Average recall_table_bioactivity_list: 0.5639226817089559
-Average precision_table_bioactivity_list: 0.47165944002195304
-Average recall_image_bioactivity_list: 0.5482070898478683
-Average precision_image_bioactivity_list: 0.47069670145856524
-Average recall_bioactivity_list: 0.5938962288566527
-Average precision_bioactivity_list: 0.487303024563647
-Average recall_entire_structure_list: 0.6470010028855662
-Average precision_entire_structure_list: 0.5871654766691081
-Average recall_entire_coreference_structure_list: 0.5086785443797069
-Average precision_entire_coreference_structure_list: 0.45134075379199823
-Average recall_scaffold_structure_list: 0.2761060217410113
-Average precision_scaffold_structure_list: 0.39103268770292
-Average recall_scaffold_coreference_structure_list: 0.23465297050913111
-Average precision_scaffold_coreference_structure_list: 0.3275483452729657
-Average recall_chiral_structure_list: 0.40641273149724405
-Average precision_chiral_structure_list: 0.4348395145695153
-Average recall_chiral_coreference_structure_list: 0.29182638120913934
-Average precision_chiral_coreference_structure_list: 0.29940473615713886
-Average recall_structure_list: 0.5531652398197516
-Average precision_structure_list: 0.5907601560641993
-Average recall_coreference_structure_list: 0.4427410088790054
-Average precision_coreference_structure_list: 0.4558614357685058
-Average recall_together_list: 0.24402906059531917
-Average precision_together_list: 0.1953756310092288
-Average values_recall_list: 0.8902607771038162
-Average values_precision_list: 0.8150835155350817
-Average values_units_recall_list: 0.8902607771038162
-Average values_units_precision_list: 0.8150835155350817
-Average types_values_recall_list: 0.8786578240581574
-Average types_values_precision_list: 0.8034600531950558
-Average types_values_units_recall_list: 0.8786578240581574
-Average types_values_units_precision_list: 0.8034600531950558
-Top 1 align recall rate : 0.348
-Top 2 align recall rate : 0.478
-Top 3 align recall rate : 0.544
-Top 4 align recall rate : 0.586
-Top 5 align recall rate : 0.61
-Top 6 align recall rate : 0.626
-Top 7 align recall rate : 0.638
-Top 8 align recall rate : 0.658
-Top 9 align recall rate : 0.686
-Top 10 align recall rate : 0.686
-Top 11 align recall rate : 0.7
-Top 12 align recall rate : 0.718
-Top 13 align recall rate : 0.724
-Top 14 align recall rate : 0.73
-Top 15 align recall rate : 0.734
-Top 16 align recall rate : 0.74
-Top 17 align recall rate : 0.748
-Top 18 align recall rate : 0.756
-Top 19 align recall rate : 0.766
-Top 20 align recall rate : 0.774
-Valid Evaluate Num -- Bioactivity :  483 / 500
-Valid Evaluate Num -- Structure :  367 / 500
+Average recall_text_affinity_list: 0.4830562960974191
+Average precision_text_affinity_list: 0.29589548767931495
+Average recall_text_affinity_list_no_protein: 0.6303564758038762
+Average precision_text_affinity_list_no_protein: 0.38805181750609224
+Average recall_figure_affinity_list: 0.5681357382089308
+Average precision_figure_affinity_list: 0.30919256809548845
+Average recall_figure_affinity_list_no_protein: 0.6842801594972289
+Average precision_figure_affinity_list_no_protein: 0.40317214368821697
+Average recall_table_affinity_list: 0.6019737440361728
+Average precision_table_affinity_list: 0.5939521865762245
+Average recall_table_affinity_list_no_protein: 0.7291028916749461
+Average precision_table_affinity_list_no_protein: 0.7321443648896243
+Average recall_image_affinity_list: 0.5899963778900902
+Average precision_image_affinity_list: 0.586570824521789
+Average recall_image_affinity_list_no_protein: 0.7131311542370689
+Average precision_image_affinity_list_no_protein: 0.7297628609777149
+Average recall_affinity_list: 0.653512352416401
+Average precision_affinity_list: 0.6136479556946058
+Average recall_affinity_list_no_protein: 0.7775015173360614
+Average precision_affinity_list_no_protein: 0.7765781906566901
+Average recall_entire_structure_list: 0.654053438263678
+Average precision_entire_structure_list: 0.6296185703847734
+Average recall_entire_coreference_structure_list: 0.5760947753229779
+Average precision_entire_coreference_structure_list: 0.5480348560868221
+Average recall_scaffold_structure_list: 0.33877377437141565
+Average precision_scaffold_structure_list: 0.38975804279410836
+Average recall_scaffold_coreference_structure_list: 0.31348304880805133
+Average precision_scaffold_coreference_structure_list: 0.3620019570544202
+Average recall_chiral_structure_list: 0.4539893614508086
+Average precision_chiral_structure_list: 0.46706463383158925
+Average recall_chiral_coreference_structure_list: 0.39574313147595097
+Average precision_chiral_coreference_structure_list: 0.4037041231366791
+Average recall_structure_list: 0.5801183586020126
+Average precision_structure_list: 0.6151265119256255
+Average recall_coreference_structure_list: 0.5112721085339007
+Average precision_coreference_structure_list: 0.534953576780146
+Average recall_together_list: 0.328413773437506
+Average precision_together_list: 0.31883580683818186
+Average recall_together_list_no_protein: 0.3869810464761288
+Average precision_together_list_no_protein: 0.403293035363173
+Average values_recall_list: 0.8501728371941346
+Average values_precision_list: 0.8865080306755284
+Average values_units_recall_list: 0.8501728371941346
+Average values_units_precision_list: 0.8865080306755284
+Average types_values_recall_list: 0.8409485951088675
+Average types_values_precision_list: 0.874716173391451
+Average types_values_units_recall_list: 0.8409485951088675
+Average types_values_units_precision_list: 0.874716173391451
+Top 1 align recall rate : 0.202
+Top 2 align recall rate : 0.296
+Top 3 align recall rate : 0.378
+Top 4 align recall rate : 0.428
+Top 5 align recall rate : 0.46
+Top 6 align recall rate : 0.5
+Top 7 align recall rate : 0.522
+Top 8 align recall rate : 0.544
+Top 9 align recall rate : 0.566
+Top 10 align recall rate : 0.59
+Top 11 align recall rate : 0.606
+Top 12 align recall rate : 0.624
+Top 13 align recall rate : 0.634
+Top 14 align recall rate : 0.644
+Top 15 align recall rate : 0.654
+Top 16 align recall rate : 0.664
+Top 17 align recall rate : 0.676
+Top 18 align recall rate : 0.684
+Top 19 align recall rate : 0.692
+Top 20 align recall rate : 0.706
 ```
 
 ### Evaluation of Four Component-level Tasks:
@@ -340,8 +319,6 @@ Valid Evaluate Num -- Structure :  367 / 500
 python3 biovista_component_evaluate.py --config_path=BioVista/config/evaluate.yaml
 ```
 
-
-
 ## Contributors
 **Student Contributors**: Jiaxian Yan*, Jintao Zhu*, Yuhang Yang, [Zaixi Zhang](https://zaixizhang.github.io/), Xukai Liu, Boyan Zhang, Kaiyuan Gao
 
@@ -354,7 +331,8 @@ Technology; Infinite Intelligence Pharma
 - [ ] Online web
 - [ ] BioMiner pypi install
 - [ ] BioMiner patent-version 
-- [ ] Open-source OCSR model MolGlyph
+- [x] Open-source OCSR model MolGlyph
+- [x] Open-srouce MLLM model BioMiner-Instruct
 
 ## Acknowledgement
 We thank for Xi Fang from DP Tech for the support of [MolParser](https://arxiv.org/abs/2411.11098). 
