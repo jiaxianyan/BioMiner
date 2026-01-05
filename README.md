@@ -2,12 +2,17 @@
 
 ## Changelog
 - 2025/12/27 BioMiner Upgrade Version Release
-    - **Biotriplet Extraction F1 score increases to 0.32**
-    - Open-weight OCSR Model **MolGlyph** 
-    - Open-weight MLLM Model **BioMiner-Instruct**
+    - **Biotriplet extraction F1 score increases to 0.32**
+    - Releasing open-weight OCSR model **MolGlyph** (SOTA on BioVista)
+    - Releasing open-weight MLLM Model **BioMiner-Instruct**
+    - Splitting Benchmark into **validation set and testing set** in a 1:9 ratio
+    - Introducing **text normalization** for more faithful and robust evaluation
+    - Improving cache mechanism of IUPAC OPSIN
+    - Fixing evaluation bugs for pIC50, pKi, and pkd values
+    - Supporting multi-gpu inference for all processes
 
 - 2025/4/23 BioMiner Initial Version Release
-    - Biotriplet Extraction F1 score 0.22
+    - Biotriplet extraction F1 score 0.22
 
 ## Introduction
 This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v1).
@@ -77,9 +82,9 @@ You can directly download them for your own use.
 
 BioMiner coordinates MLLMs (BioMiner-Instruct), DSMs (MolDetv2, MolGlyph), and DTs (RDKit, OPSIN) together. All of them are open-weight models. 
 
-- MolDetV2, available in [HuggingFace](https://huggingface.co/UniParser/MolDetv2)
-- MolGlyph, available in [HuggingFace]()
-- BioMiner-Instruct, available in [HuggingFace]()
+- **MolDetV2**: Download the model weight from DP Tech Team's [HuggingFace Repo](https://huggingface.co/UniParser/MolDetv2). Saving the model weight as `BioMiner/commons/moldet_v2_yolo11n_960_doc.pt`
+- **MolGlyph**: Download the model weight from our [HuggingFace Repo](https://huggingface.co/jiaxianustc/MolGlyph/tree/main). Saving the model weight as `BioMiner/commons/molglyph_large.pt`
+- **BioMiner-Instruct**: available in [HuggingFace]()
 
 Performance of these models on BioVista:
 
@@ -171,6 +176,18 @@ Activating the BioMiner environment
 conda activate BioMiner
 ```
 
+### Deploy MinerU, MolDetV2, MolGlyph, and BioMiner-Instruct server at background for supporting multi-gpu acceleration
+```
+# We run the experiments on 4 A800 80G GPUs
+# We recommend you to deploy servers at background using tools such as tmux
+# 
+python scripts/mineru_server.py
+python scripts/moldet_server.py
+python scripts/ocsr_server.py
+bash scripts/run_local_vllm_server_biominer_instruct.bash
+
+```
+
 ### Input a pdf file
 ```
 python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf --external_full_md_res_dir=example/full_md_molminer --external_ocsr_res_dir=example/ocsr_molparser 
@@ -217,26 +234,26 @@ python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs
 
 **Output**:
 ```
-Average recall_text_affinity_list: 0.4830562960974191
-Average precision_text_affinity_list: 0.29589548767931495
-Average recall_text_affinity_list_no_protein: 0.6303564758038762
-Average precision_text_affinity_list_no_protein: 0.38805181750609224
-Average recall_figure_affinity_list: 0.5681357382089308
-Average precision_figure_affinity_list: 0.30919256809548845
-Average recall_figure_affinity_list_no_protein: 0.6842801594972289
-Average precision_figure_affinity_list_no_protein: 0.40317214368821697
-Average recall_table_affinity_list: 0.6019737440361728
-Average precision_table_affinity_list: 0.5939521865762245
-Average recall_table_affinity_list_no_protein: 0.7291028916749461
-Average precision_table_affinity_list_no_protein: 0.7321443648896243
-Average recall_image_affinity_list: 0.5899963778900902
-Average precision_image_affinity_list: 0.586570824521789
-Average recall_image_affinity_list_no_protein: 0.7131311542370689
-Average precision_image_affinity_list_no_protein: 0.7297628609777149
-Average recall_affinity_list: 0.653512352416401
-Average precision_affinity_list: 0.6136479556946058
-Average recall_affinity_list_no_protein: 0.7775015173360614
-Average precision_affinity_list_no_protein: 0.7765781906566901
+Average recall_text_bioactivity_list: 0.4830562960974191
+Average precision_text_bioactivity_list: 0.29589548767931495
+Average recall_text_bioactivity_list_no_protein: 0.6303564758038762
+Average precision_text_bioactivity_list_no_protein: 0.38805181750609224
+Average recall_figure_bioactivity_list: 0.5681357382089308
+Average precision_figure_bioactivity_list: 0.30919256809548845
+Average recall_figure_bioactivity_list_no_protein: 0.6842801594972289
+Average precision_figure_bioactivity_list_no_protein: 0.40317214368821697
+Average recall_table_bioactivity_list: 0.6019737440361728
+Average precision_table_bioactivity_list: 0.5939521865762245
+Average recall_table_bioactivity_list_no_protein: 0.7291028916749461
+Average precision_table_bioactivity_list_no_protein: 0.7321443648896243
+Average recall_image_bioactivity_list: 0.5899963778900902
+Average precision_image_bioactivity_list: 0.586570824521789
+Average recall_image_bioactivity_list_no_protein: 0.7131311542370689
+Average precision_image_bioactivity_list_no_protein: 0.7297628609777149
+Average recall_bioactivity_list: 0.653512352416401
+Average precision_bioactivity_list: 0.6136479556946058
+Average recall_bioactivity_list_no_protein: 0.7775015173360614
+Average precision_bioactivity_list_no_protein: 0.7765781906566901
 Average recall_entire_structure_list: 0.654053438263678
 Average precision_entire_structure_list: 0.6296185703847734
 Average recall_entire_coreference_structure_list: 0.5760947753229779
