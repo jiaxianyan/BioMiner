@@ -1,3 +1,4 @@
+![logo](visualization/logo.jpg)
 # BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature
 
 ## Changelog
