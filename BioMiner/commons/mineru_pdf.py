@@ -9,6 +9,8 @@ import json
 from pathlib import Path
 from fastapi import HTTPException
 from collections import defaultdict
+import PyPDF2
+import requests
 
 try:
     from magic_pdf.tools.cli import do_parse, convert_file_to_pdf
@@ -99,9 +101,19 @@ def to_b64(file_path):
     except Exception as e:
         raise Exception(f'File: {file_path} - Info: {e}')
 
+def pdf_load_pypdf_text(pdf_path):
+    reader = PyPDF2.PdfReader(pdf_path)
+    whole_text = ''
+    for page_num in range(len(reader.pages)):
+        page = reader.pages[page_num]
+        text = page.extract_text()
+        whole_text += text
 
-def run_mineru(file_name, file_path, output_dir, device):
-    mineru_layout_file = os.path.join(output_dir, file_name, f'auto/{file_name}_middle.json')
+    return whole_text
+
+def run_mineru(file_name, file_path, output_dir, device, mineru_mode='auto'):
+    # mineru_mode: auto or vlm
+    mineru_layout_file = os.path.join(output_dir, file_name, f'{mineru_mode}/{file_name}_middle.json')
     
     if not os.path.exists(mineru_layout_file):
         load_model(device)
@@ -110,28 +122,110 @@ def run_mineru(file_name, file_path, output_dir, device):
         file = cvt2pdf(file)
         opts = {}
         opts.setdefault('debug_able', False)
-        opts.setdefault('parse_method', 'auto')
-        do_parse(output_dir, file_name, file, [], **opts)
+        opts.setdefault('parse_method', mineru_mode)
+        try:
+            do_parse(output_dir, file_name, file, [], **opts)
+        except:
+            print(f'run mineru for {file_name} failed')
 
-    with open(mineru_layout_file, 'r') as f:
-        mineru_layout = json.load(f)
+    if os.path.exists(mineru_layout_file):
+        with open(mineru_layout_file, 'r') as f:
+            mineru_layout = json.load(f)
 
-    mineru_text_file = os.path.join(output_dir, file_name, f'auto/{file_name}.md')
+        mineru_text_file = os.path.join(output_dir, file_name, f'{mineru_mode}/{file_name}.md')
 
-    with open(mineru_text_file, 'r') as f:
-        mineru_text = f.read()
+        with open(mineru_text_file, 'r') as f:
+            mineru_text = f.read()
+    else:
+        mineru_layout = None
+        try:
+            mineru_text = pdf_load_pypdf_text(file_path)
+        except:
+            mineru_text = ''
 
     return mineru_layout, mineru_text
+
+def run_mineru_client_step(input_batch, url='http://127.0.0.1:8002/predict'):
+
+    file_name, file_path, output_dir = input_batch
+
+    mineru_layout_file = os.path.join(output_dir, file_name, f'auto/{file_name}_middle.json')
+
+    try:
+        response = requests.post(url, json={
+            'file': to_b64(file_path),
+            'file_name': file_name,
+            'output_dir': output_dir
+        })
+
+        if response.status_code != 200:
+            print(f'File: {file_path} - Info: failed')
+
+    except Exception as e:
+        print(f'File: {file_path} - Info: {e}')
+
+    if os.path.exists(mineru_layout_file):
+        with open(mineru_layout_file, 'r') as f:
+            mineru_layout = json.load(f)
+
+        mineru_text_file = os.path.join(output_dir, file_name, f'auto/{file_name}.md')
+
+        with open(mineru_text_file, 'r') as f:
+            mineru_text = f.read()
+    else:
+        mineru_layout = None
+        try:
+            mineru_text = pdf_load_pypdf_text(file_path)
+        except:
+            mineru_text = ''
+
+    return mineru_layout, mineru_text
+
+
+def run_mineru_client(names, pdf_paths, output_dir, grounding_gpu_num):
+
+    import numpy as np
+    from joblib import Parallel, delayed
+
+    batches = []
+    for n, p, o in zip(names, pdf_paths, [output_dir]*len(names)):
+        batches.append((n, p, o))
+
+    n_jobs = np.clip(len(batches), 1, grounding_gpu_num)
+
+    results = Parallel(n_jobs, prefer='threads', verbose=10)(
+        delayed(run_mineru_client_step)(b) for b in batches
+    )
+
+    mineru_layouts, mineru_texts = [], []
+    for res in results:
+        mineru_layouts.append(res[0])
+        mineru_texts.append(res[1])
+
+    return mineru_layouts, mineru_texts
 
 def get_mineru_table_body_bbox(mineru_layout, enlarge_size = 0.0):
     minuer_table_bbox_dict = defaultdict(list)
     
+    mineru_mode = 'auto'
+    # if '_backend' in mineru_layout.keys() and mineru_layout['_backend'] == 'vlm':
+    #     mineru_mode = 'vlm'
+
     for pdf_page_info in mineru_layout['pdf_info']:
         page_idx = pdf_page_info['page_idx']
         page_w, page_h = pdf_page_info['page_size']
         page_table_bboxs = []
 
-        for image in pdf_page_info['tables']:
+        if mineru_mode == 'vlm':
+            table_blocks = []
+            for block in pdf_page_info['para_blocks']:
+                if block['type'] == 'table':
+                    table_blocks.append(block)
+        else: 
+            table_blocks = pdf_page_info['tables']
+        
+
+        for image in table_blocks:
             bbox = image['bbox']
             if len(bbox) == 0:
                 continue
@@ -147,6 +241,10 @@ def get_mineru_table_body_bbox(mineru_layout, enlarge_size = 0.0):
 def get_mineru_complete_figure_table_bbox(mineru_layout, enlarge_size = 1/32):
     minuer_figure_table_bbox_dict = defaultdict(list)
 
+    mineru_mode = 'auto'
+    # if '_backend' in mineru_layout.keys() and mineru_layout['_backend'] == 'vlm':
+    #     mineru_mode = 'vlm'
+
     for pdf_page_info in mineru_layout['pdf_info']:
         page_idx = pdf_page_info['page_idx']
         page_w, page_h = pdf_page_info['page_size']
@@ -155,7 +253,19 @@ def get_mineru_complete_figure_table_bbox(mineru_layout, enlarge_size = 1/32):
         figure_valid = True
         table_valid = True
 
-        for image in pdf_page_info['tables']:
+        if mineru_mode == 'vlm':
+            table_blocks = []
+            image_blocks = []
+            for block in pdf_page_info['para_blocks']:
+                if block['type'] == 'table':
+                    table_blocks.append(block)
+                elif block['type'] == 'image':
+                    image_blocks.append(block)
+        else:
+            table_blocks = pdf_page_info['tables']
+            image_blocks = pdf_page_info['images']
+
+        for image in table_blocks:
             bbox = image['bbox']
             blocks = image['blocks']
             if len(bbox) == 0:
@@ -176,7 +286,7 @@ def get_mineru_complete_figure_table_bbox(mineru_layout, enlarge_size = 1/32):
                 table_valid = False
                 break
 
-        for image in pdf_page_info['images']:
+        for image in image_blocks:
             bbox = image['bbox']
             blocks = image['blocks']
             if len(bbox) == 0:
@@ -215,6 +325,3 @@ def get_mineru_complete_figure_table_bbox(mineru_layout, enlarge_size = 1/32):
                 minuer_figure_table_bbox_dict[page_idx] = page_bbox
 
     return minuer_figure_table_bbox_dict
-
-
-        

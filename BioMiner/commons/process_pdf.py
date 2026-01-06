@@ -7,6 +7,7 @@ import cv2
 import io
 import base64
 import re
+Image.MAX_IMAGE_PIXELS = 933120000
 
 def check_bbox_in_area(bbox, area_bbox):
     # print(area_bbox)
@@ -89,15 +90,31 @@ def pdf_load_text_and_image(name, pdf_path, save_path):
     return whole_text, image_paths
 
 def load_pdf_pages_contain_tables_and_figures(name, middle_json_data, pdf_path, save_path):
+    if middle_json_data is None:
+        return pdf_load_pypdf_images(name, pdf_path, save_path)
+
     os.makedirs(os.path.join(save_path, name), exist_ok=True)
     pdf_images = pdf2image.convert_from_path(pdf_path)
     image_paths = []
+
+    mineru_mode = 'pipline'
+    # if '_backend' in middle_json_data.keys() and middle_json_data['_backend'] == 'vlm':
+    #     mineru_mode = 'vlm'
 
     for pdf_page_info in middle_json_data['pdf_info']:
         page_idx = int(pdf_page_info['page_idx'])
 
         page_contain_images = False
-        for image in pdf_page_info['tables'] + pdf_page_info['images']:
+
+        if mineru_mode == 'vlm':
+            image_blocks = []
+            for block in pdf_page_info['para_blocks']:
+                if block['type'] in ['table', 'image']:
+                    image_blocks.append(block)
+        else:
+            image_blocks = pdf_page_info['tables'] + pdf_page_info['images']
+
+        for image in image_blocks:
             bbox = image['bbox']
             if len(bbox) > 0:
                 page_contain_images = True
@@ -250,22 +267,27 @@ def pdf_load_pypdf_images(name, pdf_path, save_path):
     # load images, save as individual files, return image paths
 
     os.makedirs(os.path.join(save_path, name), exist_ok=True)
-    images = pdf2image.convert_from_path(pdf_path)
     image_paths = []
+    try:
+        images = pdf2image.convert_from_path(pdf_path)
+    except:
+        return image_paths
+    
     for i, image in enumerate(images):
         image_path = os.path.join(save_path, name, f'{name}_image_{i}.png')
+        # if not os.path.exists(image_path):
         image.save(image_path, 'PNG')
         image_paths.append(image_path)
 
     return image_paths
 
-def pdf_load_text_and_image_new(name, pdf_path, save_path, parse_txt_method, parse_image_method, no_text_table, miner_u_dir=None):
+def pdf_load_text_and_image_new(name, pdf_path, save_path, parse_txt_method, parse_image_method, no_text_table, miner_u_dir=None, miner_u_model='auto'):
     
     # print(save_path)
     if parse_txt_method == 'pypdf':
         whole_text = pdf_load_pypdf_text(pdf_path)
     elif parse_txt_method == 'mineru':
-        miner_u_md_path = os.path.join(miner_u_dir, name, 'auto', f'{name}.md')
+        miner_u_md_path = os.path.join(miner_u_dir, name, miner_u_model, f'{name}.md')
         if os.path.exists(miner_u_md_path):
             whole_text = pdf_load_mineru_text(miner_u_md_path, no_text_table)
         else:
@@ -276,7 +298,7 @@ def pdf_load_text_and_image_new(name, pdf_path, save_path, parse_txt_method, par
     if parse_image_method == 'pypdf':
         image_paths = pdf_load_pypdf_images(name, pdf_path, save_path)
     elif parse_image_method == 'mineru_seg':
-        miner_u_middile_json_path = os.path.join(miner_u_dir, name, 'auto', f'{name}_middle.json')
+        miner_u_middile_json_path = os.path.join(miner_u_dir, name, miner_u_model, f'{name}_middle.json')
         if os.path.exists(miner_u_middile_json_path):
             with open(miner_u_middile_json_path, 'r') as f:
                 middle_json_data = json.load(f)
@@ -284,7 +306,7 @@ def pdf_load_text_and_image_new(name, pdf_path, save_path, parse_txt_method, par
         else:
             image_paths = pdf_load_pypdf_images(name, pdf_path, save_path)
     elif parse_image_method == 'mineru_contain':
-        miner_u_middile_json_path = os.path.join(miner_u_dir, name, 'auto', f'{name}_middle.json')
+        miner_u_middile_json_path = os.path.join(miner_u_dir, name, miner_u_model, f'{name}_middle.json')
         if os.path.exists(miner_u_middile_json_path):
             with open(miner_u_middile_json_path, 'r') as f:
                 middle_json_data = json.load(f)

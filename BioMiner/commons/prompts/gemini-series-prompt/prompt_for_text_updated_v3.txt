@@ -1,0 +1,39 @@
+Task: Extract all protein-ligand binding affinity data from the provided scientific literature text.
+
+Instructions:
+
+1. The following context is the text of a scientific literature. Extract protein-ligand binding affinity data from the context.
+
+2. Protein-ligand affinity data consists of three components:
+    Protein: The name of the protein.
+    Ligand: The ligand coreference in the paper.
+    Affinity: The affinity measurement, which includes:
+        (1) Type: One of "IC50", "Kd", "Ki", "pIC50", "pKd", "pKi".
+        (2) Value: The numerical value of the affinity measurement.
+        (3) Unit: The unit of the affinity measurement (e.g., nM, µM, mM, ""). If the type is one of "pIC50", "pKd", "pKi", the unit is "".
+
+3. Follow these strict standardization rules for protein name and ligand coreference to ensure data consistency:
+    A. General Text Processing Rules (Apply to both protein name and ligand coreference):
+        (1) Case Sensitivity: Preserve the original casing.
+        (2) Super/Subscripts: Flatten them into a linear sequence (e.g., ^{a}P^{b}_{c} becomes a P b c).
+        (3) Greek Letters: Replace with their full English names (e.g., α becomes Alpha, δ becomes Delta).
+        (4) Symbols: Keep meaningful hyphens (-), slashes (/), and parentheses (). Remove footnote markers like *, #, or trailing letters (a, b, c).
+        (5) Whitespace: Normalize multiple spaces to a single space.
+    B. Protein Coreference Standardization Rules:
+        (1) Core Name: Extract the core protein name. Ignore descriptive prefixes/suffixes about its state (p-, active), purity (recombinant), binding domain (BD1, BD2), measurment method (FP) or experimental context (cell-based). Ignore wild-type identifiers (WT, Wild-Type).
+        (2) Species & Subtypes: Keep species prefixes (h, m, human) and subtype/isoform identifiers (Alpha, 1, 3). They are part of the core name. Example: human PI3KAlpha.
+        (3) Mutants: Must be recorded. Standardize all mutation information to the right of the protein name. Preserve the original 1-letter or 3-letter amino acid code.
+            Example 1: T790M-EGFR becomes EGFR T790M.
+            Example 2: EGFR (L858R, T790M) becomes EGFR (L858R, T790M).
+    C. Ligand Coreference Standardization Rules:
+        (1) Remove Generic Terms: Remove non-specific prefixes/suffixes like compound, ligand, inhibitor. Example: compound 5 becomes 5.
+        (2) Consolidate Aliases: Find all aliases for a single ligand (full name, abbreviation, code/number) and join them with a semicolon ;.
+            The recommended order is: [Full Chemical Name];[Abbreviation];[Code/Number].
+            Example: If a ligand is referred to as "Gefitinib", "ZD1839", and "1", record it as Gefitinib;ZD1839;1. If only "compound 1" is mentioned, record it as 1.
+        (3) Remove Salt Forms: Exclude common salt/solvate forms like HCl, mesylate. Example: Imatinib mesylate becomes Imatinib.
+
+4. Output the extracted data in the following JSON format strictly:"json```[{"protein": "protein name", "ligand": "ligand coreference" , "affinity": {"type": "ki/kd/ic50", "value": "affinity value", "unit": "affinity unit"}}]```"
+
+5. Only consider protein-ligand binding affinity measurements of type "IC50", "Kd", "Ki", "pIC50", "pKd", or "pKi". Ignore other types of affinity measurements.
+
+Text Context of the Paper:

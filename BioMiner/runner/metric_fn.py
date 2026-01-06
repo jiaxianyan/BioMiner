@@ -260,7 +260,38 @@ def is_float(string):
     return True
   except ValueError:
     return False
-  
+
+def unify_unit_pvalue(a_type, unit, value):        
+
+    if a_type.lower() in ['pki', 'pkd', 'pic50']:
+        return '', float(value.strip())
+
+    if not is_float(value) or isinstance(unit, float):
+        # print('do not unify unit')
+        # print(f'{value} value.isdigit:{is_float(value)}')
+        # print(f'{unit} isinstance(unit, float):{isinstance(unit, float)}')
+
+        return unit, value
+    
+    unit = unit.lower()
+
+    value = float(value)
+
+    if unit == 'm':
+        value = value * 1e9
+    elif unit == 'mm':
+        value = value * 1e6
+    elif unit == 'um' or unit == 'μm' or unit == 'µm':
+        value = value * 1e3
+    elif unit == 'nm':
+        value = value
+    elif unit == 'pm':
+        value = value * 1e-3
+    else:
+        # print(f'Invalid unit : {unit}')
+        return unit, value
+    
+    return 'nm', str(value)
 
 def unify_unit(unit, value):
     if not is_float(value) or isinstance(unit, float):
@@ -359,7 +390,7 @@ def process_bioactivity_with_different_coreferences(df_bioactivity):
     df_bioactivity = df_bioactivity[df_bioactivity['protein'].notna()]
     df_bioactivity = df_bioactivity[df_bioactivity['type'].notna()]
     df_bioactivity = df_bioactivity[df_bioactivity['value'].notna()]
-    df_bioactivity = df_bioactivity[df_bioactivity['unit'].notna()]
+    df_bioactivity = df_bioactivity[df_bioactivity['unit'].notna() | df_bioactivity['type'].str.lower().isin(['pic50','pki','pkd'])]
 
     ligands = df_bioactivity['ligand'].values.tolist()
     proteins = df_bioactivity['protein'].values.tolist()
@@ -375,7 +406,7 @@ def process_bioactivity_with_different_coreferences(df_bioactivity):
         #     continue
 
         v = process_bioactivity_value(v)
-        u, v = unify_unit(u, v)
+        u, v = unify_unit_pvalue(a_t,u, v)
 
         ls = l.split(';')
         ps = p.split(';')
@@ -573,11 +604,11 @@ def evaluate_bioactivity_only(df_bioactivity_labels, df_extracted_bioactivity_da
     label_values = [process_bioactivity_value(v) for v in label_values]
     label_units = [process_bioactivity_unit(u) for u in label_units]
 
-    unify_extracted_units = [unify_unit(u, v)[0] for (u,v) in zip(extracted_units, extracted_values)]
-    unify_extracted_values = [unify_unit(u, v)[1] for (u,v) in zip(extracted_units, extracted_values)]
+    unify_extracted_units = [unify_unit_pvalue(t, u, v)[0] for (t, u,v) in zip(extracted_types, extracted_units, extracted_values)]
+    unify_extracted_values = [unify_unit_pvalue(t, u, v)[1] for (t, u,v) in zip(extracted_types, extracted_units, extracted_values)]
 
-    unify_label_units = [unify_unit(u, v)[0] for (u,v) in zip(label_units, label_values)]
-    unify_label_values = [unify_unit(u, v)[1] for (u,v) in zip(label_units, label_values)]
+    unify_label_units = [unify_unit_pvalue(t, u, v)[0] for (t, u,v) in zip(label_types, label_units, label_values)]
+    unify_label_values = [unify_unit_pvalue(t, u, v)[1] for (t, u,v) in zip(label_types, label_units, label_values)]
 
 
 
@@ -872,7 +903,7 @@ def evaluate_complex_match_step(given_smiles, given_protein, given_bioactivity_l
     # 4. unify label unit, removing >,<,=,...
     label_t, label_v, label_u = given_bioactivity_labels
     label_v = process_bioactivity_value(label_v)
-    label_u, label_v = unify_unit(label_u, label_v)
+    label_u, label_v = unify_unit_pvalue(label_t, label_u, label_v)
 
     # 5. currently, we only align the bioactivity label through ligand smiles similarity
     #    so, here, we calculate the similarity score based on ligand smiles for alingment.
@@ -890,8 +921,8 @@ def evaluate_complex_match_step(given_smiles, given_protein, given_bioactivity_l
             align_index = min(i, len(similarity_result) - 1)
             align_bioactivity = similarity_result[align_index]
             _, _, align_t, align_v, align_u = align_bioactivity[1]
-            align_v = runner.metric_fn.process_bioactivity_value(align_v)
-            align_u, align_v = runner.metric_fn.unify_unit(align_u, align_v)
+            align_v = process_bioactivity_value(align_v)
+            align_u, align_v = unify_unit_pvalue(align_t,align_u, align_v)
             if (align_t, align_v, align_u) == (label_t, label_v, label_u):
                 match_results[-1] = True
                 break

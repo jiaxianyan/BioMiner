@@ -14,7 +14,7 @@ from fastapi import HTTPException
 
 class MinerUAPI(ls.LitAPI):
     def __init__(self, output_dir='/tmp'):
-        self.output_dir = Path(output_dir)
+        self.output_dir = output_dir
 
     def setup(self, device):
         if device.startswith('cuda'):
@@ -37,19 +37,25 @@ class MinerUAPI(ls.LitAPI):
         file = request['file']
         file_name = request['file_name']
         file = self.cvt2pdf(file)
+
+        output_dir = request['output_dir']
+        if output_dir is None:
+            output_dir = self.output_dir
+
         opts = request.get('kwargs', {})
         opts.setdefault('debug_able', False)
         opts.setdefault('parse_method', 'auto')
-        return file, file_name, opts
+        return file, file_name, opts, output_dir
 
     def predict(self, inputs):
         try:
             pdf_name = inputs[1]
-            output_dir = self.output_dir.joinpath(pdf_name)
-            self.do_parse(self.output_dir, pdf_name, inputs[0], [], **inputs[2])
-            return output_dir
+            output_dir = inputs[3]
+            file_output_dir = os.path.join(output_dir, pdf_name)
+            self.do_parse(output_dir, pdf_name, inputs[0], [], **inputs[2])
+            return file_output_dir
         except Exception as e:
-            shutil.rmtree(output_dir, ignore_errors=True)
+            shutil.rmtree(file_output_dir, ignore_errors=True)
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             self.clean_memory()
@@ -92,8 +98,9 @@ if __name__ == '__main__':
     server = ls.LitServer(
         MinerUAPI(output_dir='./tmp'),
         accelerator='cuda',
-        devices='auto',
+        devices=[0, 1, 2, 3],
         workers_per_device=1,
         timeout=False
     )
-    server.run(port=8000)
+    print("Starting MinerU 4-GPU Server on port 8002...")
+    server.run(port=8002)

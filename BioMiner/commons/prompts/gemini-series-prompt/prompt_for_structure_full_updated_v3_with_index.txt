@@ -16,4 +16,11 @@ Instructions:
 
 7. Please outputing the results in this json format: "json```[{"index": "box index of the detected molecule", "identifier": "coreference of the molecule in the paper"}]```"
 
-8. The box index of detected molecules are: <index></index>. Therefore, in the result, the box index must be in them.
+8. Follow these strict standardization rules for identifier to ensure data consistency:
+    (a) Remove Generic Terms: Remove non-specific prefixes/suffixes like compound, ligand, inhibitor. Example: compound 5 becomes 5.
+    (b) Consolidate Aliases: Find all aliases for a single molecule (full name, abbreviation, code/number) and join them with a semicolon ;.
+        The recommended order is: [Full Chemical Name];[Abbreviation];[Code/Number].
+        Example 1: If the molecule is referred to as "Gefitinib (1)", record it as Gefitinib;1. 
+        Example 2: If only "compound 1" is mentioned, record it as 1.
+
+9. The box index of detected molecules are: <index></index>. Therefore, in the result, the box index must be in them.

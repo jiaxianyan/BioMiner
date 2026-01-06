@@ -351,7 +351,7 @@ class Decoder(nn.Module):
         results = {}
         predictions = []
         for format_ in self.formats:
-            if format_ in ['atomtok', 'atomtok_coords', 'chartok_coords']:
+            if format_ in ['atomtok', 'atomtok_coords', 'chartok_coords', 'molparser_caption']:
                 max_len = FORMAT_INFO[format_]['max_len']
                 results[format_] = self.decoder[format_].decode(encoder_out, beam_size, n_best, max_length=max_len)
                 outputs, scores, token_scores, *_ = results[format_]

@@ -10,6 +10,21 @@ from rdkit.Chem import DataStructs
 from rdkit.Chem import AllChem
 import warnings
 
+def replace_group(smiles):
+
+    mol = Chem.MolFromSmiles(smiles)
+
+    if mol:
+        for atom in mol.GetAtoms():
+            if atom.GetSymbol() == '*' and atom.GetIsotope() == 1:
+                atom.SetIsotope(0)
+                break
+
+        new_smiles = Chem.MolToSmiles(mol)
+        return new_smiles
+    else:
+        return smiles
+    
 def neutralize_smiles(smi):
     mol = Chem.MolFromSmiles(smi)
     pattern = Chem.MolFromSmarts("[+1!h0!$([*]~[-1,-2,-3,-4]),-1!$([*]~[+1,+2,+3,+4])]")
@@ -43,7 +58,7 @@ def check_smiles_match(smia, smib):
         nsmib = neutralize_smiles(smib)
         cnsmia = smiles_to_canosmiles(nsmia)
         cnsmib = smiles_to_canosmiles(nsmib)
-        return cnsmia == cnsmib
+        return replace_group(cnsmia) == replace_group(cnsmib)
     except:
         return False
     

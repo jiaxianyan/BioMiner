@@ -7,6 +7,7 @@ import logging
 from ultralytics import YOLO
 from PIL import Image
 from BioMiner.commons.process_pdf import draw_bbox_xywh
+import gc
 
 # -----------------------------------------------------------
 
@@ -40,8 +41,8 @@ class MolGlyphAPI(ls.LitAPI):
         try:
             # 调用 MolGlyph 原始推理接口
             # 注意：这里假设 predict_image_files 支持传入 list
-
-            results1 = self.det_model.predict(imgs, imgsz=960, conf=0.5)
+            with torch.no_grad():
+                results1 = self.det_model.predict(imgs, imgsz=960, conf=0.5)
 
             all_bboxes = []
             
@@ -89,17 +90,25 @@ class MolGlyphAPI(ls.LitAPI):
             # 整个 Batch 失败
             logging.error(f"Inference failed: {e}")
             raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            self.clean_memory()
 
     def encode_response(self, output):
         # 5. 返回结果
         return {"all_bboxes": output}
+
+    def clean_memory(self):
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()
+        gc.collect()
 
 if __name__ == '__main__':
     # 配置多卡服务
     server = ls.LitServer(
         MolGlyphAPI(),
         accelerator="cuda",
-        devices=[2, 3, 4, 6],  # 指定使用的 GPU ID
+        devices=[0, 1, 2, 3],  # 指定使用的 GPU ID
         workers_per_device=1,  # 每个 GPU 跑一个模型实例
         timeout=False         # 禁用超时，防止大 Batch 处理时间过长断开
     )

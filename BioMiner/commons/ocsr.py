@@ -5,9 +5,13 @@ from PIL import Image, ImageDraw, ImageFont
 from BioMiner.commons.process_pdf import image_segment_given_box_xywh, draw_bbox_xywh
 from BioMiner.MolScribe.molscribe import MolScribe
 from rdkit import Chem
+from tqdm import tqdm 
+from BioMiner.commons.molglyph_utils import get_refactor, Translator
+from BioMiner.MolScribe.molscribe import MolGlyph
 
 def visualize_all_box(name, bboxes, page_image_dir, save_path):
-    os.makedirs(os.path.join(save_path, name), exist_ok=True)
+    if len(bboxes) > 0:
+        os.makedirs(os.path.join(save_path, name), exist_ok=True)
     page2bbox = defaultdict(list)
     all_segmented_box_paths = []
     
@@ -40,7 +44,7 @@ def visualize_all_box(name, bboxes, page_image_dir, save_path):
     return all_segmented_box_paths
 
 def run_molscribe_batch(bboxes, image_paths, device):
-    model = MolScribe('BioMiner/MolScribe/ckpts/swin_base_char_aux_1m680k.pth', device)
+    model = MolScribe('swin_base_transformer_best.pth', device)
     if len(image_paths) == 0:
         return []
 
@@ -48,8 +52,26 @@ def run_molscribe_batch(bboxes, image_paths, device):
 
     pred_smiles = []
     # print(bboxes)
-    for idx, (pred_res_item, image_path) in enumerate(zip(output, image_paths)):
+    for idx, (pred_res_item, image_path) in tqdm(enumerate(zip(output, image_paths)), desc='ocsr predciting'):
         smiles = pred_res_item['smiles']
+        pred_smiles.append(smiles)
+        # print(f'{image_path}:{smiles}')
+        bboxes[idx]['smiles'] = smiles
+    # print(bboxes)
+
+    return bboxes
+
+def run_molglyph_batch(bboxes, image_paths, device):
+    model = MolGlyph(f'BioMiner/MolScribe/ckpts/MolGlyph.pth', device)
+    if len(image_paths) == 0:
+        return []
+
+    output = model.predict_image_files(image_paths, return_atoms_bonds=False, return_confidence=False)
+
+    pred_smiles = []
+    # print(bboxes)
+    for idx, (s, image_path) in enumerate(zip(output, image_paths)):
+        smiles = get_refactor(Translator.refactor(s))
         pred_smiles.append(smiles)
         # print(f'{image_path}:{smiles}')
         bboxes[idx]['smiles'] = smiles

@@ -1,11 +1,13 @@
-device: cuda:4
-output_dir: ./BioMiner/example_log
-overwrite_bioactivity_text: true
-overwrite_bioactivity_image: true
-overwrite_structure_full: true
-overwrite_structure_part: true
+grounding_gpu_num: 4
+task_name: biominer_upgrade
+output_dir: ./tmp/test_biovista_upgrade
+############
+overwrite_bioactivity_text: false
+overwrite_bioactivity_image: false
+overwrite_structure_full: false
+overwrite_structure_part: false
 inference_given_structure_bioactivity: true
-n_jobs: 64
+n_jobs: 16
 
 data:
   parse_text_method: mineru # best: mineru [pypdf, mineru] 
@@ -14,17 +16,17 @@ data:
   prompt_path: ./BioMiner/commons/prompts
 
 model:
-  base_url:
-  api_key:
-  mol_detection_model: yolo
-  ocsr_model: molscribe
+  base_url: https://aihubmix.com/v1
+  api_key: sk-di6EQiNDxyGzzoFa93389fA755B14eAfAf31B863F2E6C369
+  mol_detection_model: moldetv2
+  ocsr_model: molglyph
   merge_strategy: direct
-  text_mllm_type: gemini-2.0-flash 
-  vision_mllm_type: gemini-2.0-flash 
-  bioactivity_text_strategy: updated # best: updated
-  bioactivity_image_strategy: updated # best: updated
-  structure_full_strategy: updated-with-box-index # best: updated-with-box-index
-  structure_part_strategy: updated-with-box-index # best: updated-with-box-index
+  text_mllm_type: local-biominer-instruct
+  vision_mllm_type: local-biominer-instruct
+  bioactivity_text_strategy: updated_v3 # best: updated
+  bioactivity_image_strategy: updated_v3 # best: updated
+  structure_full_strategy: updated-v3-with-box-index # best: updated-with-box-index
+  structure_part_strategy: updated-v3-with-box-index # best: updated-with-box-index
   structure_full_split_molecule_num: 4 # best: 4
   structure_full_seg_image: true # best: true
   structure_full_seg_enlarge: 0.125 # best: 0.125

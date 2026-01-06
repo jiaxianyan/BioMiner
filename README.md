@@ -18,7 +18,7 @@
 This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v1).
 If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
 
-- We introduce **BioMiner**, a multi-modal system integrating multi-modal large language models (MLLMs), domain-specific models (DSMs), and domain tools (DTs) to automatically extract protein-ligand-bioactivity triplets from thousands to potentially millions of publications at high throughput (about 14 seconds/paper on 8 V100 GPUs). 
+- We introduce **BioMiner**, a multi-modal system integrating multi-modal large language models (MLLMs), domain-specific models (DSMs), and domain tools (DTs) to automatically extract protein-ligand-bioactivity triplets from thousands to potentially millions of publications at high throughput (about 20 seconds/paper on 4 A800 80G GPUs). 
 
 - To evaluate extraction capabilities and support method development, we establish a new benchmark **BioVista**, containing 16,457 bioactivity and 8,735 structures manually collected from 500 publications. To our knowledge, **BioVista** is the largest benchmark dedicated to protein-ligand bioactivity extraction.
 
@@ -59,7 +59,7 @@ Downloading BioVista according to the following links, and unzip them in the `./
 
 | **Tasks**    | **Metrics** | **Input** | **Ground-truth Labels** | **Download** |
 | ----------- | ----------- | ----------- | ----------- | ----------- | 
-|  Bioactivity Triplet Extraction | F1, Precision, Recall | 500 Papers | 16,457 bioactivity | [Link](https://drive.google.com/file/d/1xITA_Mub9u1MCZjlgs26qL_dMCrzS9Rn/view?usp=drive_link) | 
+|  Bioactivity Triplet Extraction | F1, Precision, Recall | 500 Papers | 16,457 bioactivity | [Link](https://drive.google.com/file/d/14icAlg_jEy3uE7FOcDD-EYn3UIKQxC__/view?usp=drive_link) | 
 |  Structure-Bioactivity Annotation | Recall@N | 500 structure-paper pairs |  500 structure-bioactivity pairs | [Link](https://drive.google.com/file/d/1cLC3NePtxctIurnCVaNLw0JzBWYrWTVW/view?usp=drive_link) | 
 |  Molecule Detection | Average Precision | 500 Papers | 11,212 boundary boxes  | [Link](https://drive.google.com/file/d/1SvsdgrizDqg5V-MGXEPGMmu4JmmhiFae/view?usp=drive_link) | 
 |  OCSR | precision | 8,861 2D molecule structure depictions | 8,861 SMILES  | [Link](https://drive.google.com/file/d/11iCH0j7U9iFgwXahjkWZouNyqATfEPoL/view?usp=drive_link) | 
@@ -82,9 +82,9 @@ You can directly download them for your own use.
 
 BioMiner coordinates MLLMs (BioMiner-Instruct), DSMs (MolDetv2, MolGlyph), and DTs (RDKit, OPSIN) together. All of them are open-weight models. 
 
-- **MolDetV2**: Download the model weight from DP Tech Team's [HuggingFace Repo](https://huggingface.co/UniParser/MolDetv2). Saving the model weight as `BioMiner/commons/moldet_v2_yolo11n_960_doc.pt`
-- **MolGlyph**: Download the model weight from our [HuggingFace Repo](https://huggingface.co/jiaxianustc/MolGlyph/tree/main). Saving the model weight as `BioMiner/commons/molglyph_large.pt`
-- **BioMiner-Instruct**: available in [HuggingFace]()
+- **MolDetV2**: Download the model weight from DP Tech Team's [HuggingFace Repo](https://huggingface.co/UniParser/MolDetv2). Saving the model weight as `scripts/moldet_v2_yolo11n_960_doc.pt`
+- **MolGlyph**: Download the model weight from our [HuggingFace Repo](https://huggingface.co/jiaxianustc/MolGlyph). Saving the model weight as `scripts/molglyph_large.pt`
+- **BioMiner-Instruct**: Download the model weight from our [HuggingFace Repo](https://huggingface.co/jiaxianustc/BioMiner-Instruct). Saving the model weight to the directory `scripts/local-biominer-instruct`
 
 Performance of these models on BioVista:
 
@@ -99,12 +99,12 @@ Performance of these models on BioVista:
 
 - OCSR Performance:
 
-Structure Types | MolMiner | MolScribe | MolNexTR | DECIMER | **MolScribe (Ours)** |**MolParser** | **MolGlyph (Ours)** |
-| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-Full | **0.774** | 0.703 | 0.695 | 0.545 | 0.633 | 0.669 | 0.758 |
-Chiral | 0.497 | 0.481 | 0.419 | 0.326 | **0.530** | 0.352 | 0.504 |
-Markush | 0.185 | 0.156 | 0.045 | 0.000 | 0.635 | 0.733| **0.770** |
-All | 0.507 | 0.455 | 0.401 | 0.298 | 0.634 | 0.703 | **0.764** |
+Structure Types | MolMiner | MolScribe | MolNexTR | DECIMER |**MolParser** | **MolGlyph (Ours)** |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+Full | **0.774** | 0.703 | 0.695 | 0.545 | 0.669 | 0.758 |
+Chiral | 0.497 | 0.481 | 0.419 | 0.326 | 0.352 | **0.504** |
+Markush | 0.185 | 0.156 | 0.045 | 0.000 | 0.733| **0.770** |
+All | 0.507 | 0.455 | 0.401 | 0.298  | 0.703 | **0.764** |
 
 - MLLM performance on MLLM-related tasks:
 
@@ -113,38 +113,13 @@ All | 0.507 | 0.455 | 0.401 | 0.298 | 0.634 | 0.703 | **0.764** |
 
 ### Running Installation
 
-We provide two ways to install this version.
+We recommend to install two conda environments, one main env for running the main code, one vllm env for delopying MLLM BioMiner-Instruct using vllm.
 
-#### 1. Install key packages one by one 
+We provide the yaml files to help install environment.
 
-We provide a script **conda_env.sh** that makes it easy to install the python dependencies of BioMiner. You just need to modify several packages according to you cuda version.
+#### 1. Install main env
 ```
-conda create -y -n BioMiner python=3.10
-conda activate BioMiner
-
-# Install key packages
-bash ./scripts/conda_env.sh
-
-# Install MinerU. 
-# Prepare MinerU config json
-mv magic-pdf.json ~
-# Install MinerU v1.3.1 (cpu version first)
-pip3 install -U magic-pdf[full]==1.3.1 --extra-index-url https://wheels.myhloli.com
-# Check if install cpu version successfully
-magic-pdf --version
-# for cpu version, it takes several minutes to process a pdf
-magic-pdf -p small_ocr.pdf -o ./output
-# Install MinerU gpu version
-python3 -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
-# Download MinerU model checkpoints
-python download_models.py
-# for gpu version, it only takes several seconds to process a pdf
-magic-pdf -p small_ocr.pdf -o ./output
-```
-
-#### 2. Install from yaml file
-```
-conda env create -f upgrade_environment.yml
+conda env create -f main_environment.yml
 conda activate BioMiner
 
 # Install MinerU. 
@@ -164,33 +139,41 @@ python download_models.py
 magic-pdf -p small_ocr.pdf -o ./output
 ```
 
+#### 2. Install vllm env
+```
+conda env create -f vllm_environment.yml
+conda activate vllm_py310
+```
 
 ## Usage of BioMiner
 
-MLLM BioMiner-Instruct is employed in BioMiner, first you should config the `api_key` and `base_url` in config file `BioMiner/config/default.yaml` for calling MLLM.
+Our codes support users to choose MLLM they want to use.
+
+If you want to use BioMiner-Instruct, you do not need to further modify the config file. You should deploy BioMiner-Instruct locally and we recommend at least two A800 80G GPUs.
+
+Otherwise, if you want to use closed-source MLLMs through api, you should config the `api_key` and `base_url` in config file `BioMiner/config/default.yaml` for calling MLLM. At this time, you only need one GPU, such as 4090 24G.
 
 Due to the copyright of papers, here, we only take two open access papers as an example to show the usage:
 
-Activating the BioMiner environment
+### Start biominer server
 ```
+# Our codes support multi-gpu inference by deploying models as servers to accelerate inference
+# We run the demo experiments on 4 A800 80G GPUs
+# We recommend to deploy servers at background using tools such as tmux
+
 conda activate BioMiner
-```
+python scripts/mineru_server.py # at tmux window 0
+python scripts/moldet_server.py # at tmux window 1
+python scripts/ocsr_server.py # at tmux window 2 
 
-### Deploy MinerU, MolDetV2, MolGlyph, and BioMiner-Instruct server at background for supporting multi-gpu acceleration
-```
-# We run the experiments on 4 A800 80G GPUs
-# We recommend you to deploy servers at background using tools such as tmux
-# 
-python scripts/mineru_server.py
-python scripts/moldet_server.py
-python scripts/ocsr_server.py
-bash scripts/run_local_vllm_server_biominer_instruct.bash
+conda activate vllm_py310
+bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3
 
 ```
 
-### Input a pdf file
+### 2. Inference Input a pdf file
 ```
-python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf --external_full_md_res_dir=example/full_md_molminer --external_ocsr_res_dir=example/ocsr_molparser 
+python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf 
 ```
 **Output (Top-10 lines)**:
 ```
@@ -213,7 +196,6 @@ python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=
 ```
 python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs 
 ```
-
 
 ### Parameter Descriptor
 
@@ -282,26 +264,6 @@ Average types_values_recall_list: 0.8409485951088675
 Average types_values_precision_list: 0.874716173391451
 Average types_values_units_recall_list: 0.8409485951088675
 Average types_values_units_precision_list: 0.874716173391451
-Top 1 align recall rate : 0.202
-Top 2 align recall rate : 0.296
-Top 3 align recall rate : 0.378
-Top 4 align recall rate : 0.428
-Top 5 align recall rate : 0.46
-Top 6 align recall rate : 0.5
-Top 7 align recall rate : 0.522
-Top 8 align recall rate : 0.544
-Top 9 align recall rate : 0.566
-Top 10 align recall rate : 0.59
-Top 11 align recall rate : 0.606
-Top 12 align recall rate : 0.624
-Top 13 align recall rate : 0.634
-Top 14 align recall rate : 0.644
-Top 15 align recall rate : 0.654
-Top 16 align recall rate : 0.664
-Top 17 align recall rate : 0.676
-Top 18 align recall rate : 0.684
-Top 19 align recall rate : 0.692
-Top 20 align recall rate : 0.706
 ```
 
 ### Evaluation of Four Component-level Tasks:
