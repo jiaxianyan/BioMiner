@@ -18,7 +18,7 @@ class MolGlyphAPI(ls.LitAPI):
         self.device = device
         
         # 模型路径 (建议配置化)        
-        self.det_model =  YOLO("BioMiner/commons/moldet_v2_yolo11n_960_doc.pt").to(device)
+        self.det_model =  YOLO("scripts/moldet_v2_yolo11n_960_doc.pt").to(device)
         print(f"Model loaded successfully on {device}")
 
     def decode_request(self, request):

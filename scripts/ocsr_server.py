@@ -28,7 +28,7 @@ class MolGlyphAPI(ls.LitAPI):
         self.device = device
         
         # 模型路径 (建议配置化)
-        model_path = '/data/jiaxianyan/1-git/MolGlyph/output/molparser/molscribe_molparser_sft_mixed_large_a800-02_12-08-03-18/swin_base_transformer_best.pth'
+        model_path = 'scripts/molglyph_large.pt'
         
         # 初始化模型
         self.ocsr_model = MolGlyph(model_path, self.device)

@@ -1,6 +1,6 @@
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 python -m vllm.entrypoints.openai.api_server \
-    --model /data/jiaxianyan/huggingface_models/qwen3-vl-32b-final-total-rank-64-300-steps-v1216 \
+    --model scripts/local-biominer-instruct \
     --served-model-name local-biominer-instruct  \
     --trust-remote-code \
     --tensor-parallel-size 4 \
