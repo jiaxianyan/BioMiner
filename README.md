@@ -8,7 +8,6 @@
     - Splitting Benchmark into **validation set and testing set** in a 1:9 ratio
     - Introducing **text normalization** for more faithful and robust evaluation
     - Improving cache mechanism of IUPAC OPSIN
-    - Fixing evaluation bugs for pIC50, pKi, and pkd values
     - Supporting multi-gpu inference for all processes
 
 - 2025/4/23 BioMiner Initial Version Release
@@ -171,7 +170,7 @@ bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3
 
 ```
 
-### 2. Inference Input a pdf file
+### Run inference given a pdf file
 ```
 python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf 
 ```
@@ -192,7 +191,7 @@ python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=
 ...
 ```
 
-### Input a directory contains pdfs
+### Run inference given a directory contains pdfs
 ```
 python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs 
 ```
