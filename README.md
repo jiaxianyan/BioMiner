@@ -270,13 +270,13 @@ Average types_values_units_precision_list: 0.874716173391451
 1. We first inference the result:
     - Molecule Detection
     ```
-    # Taking YOLO as an example (BioMiner use MolMiner + YOLO for tables)
+    # Taking YOLO as an example (BioMiner use MolDetV2)
     python3 BioVista/component_infernece/molecule_detection/moldetect_inference_batch.py
     ```
 
     - OCSR
     ```
-    # Taking MolScribe as an example (BioMiner use MolParser)
+    # Taking MolScribe as an example (BioMiner use MolGlyph)
     python3 BioVista/component_infernece/ocsr/molscribe_inference_batch.py
     ```
 
