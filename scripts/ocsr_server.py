@@ -5,18 +5,9 @@ import litserve as ls
 from fastapi import HTTPException
 import logging
 import gc
-# ==============================================================================
-# 导入你的模型和工具函数
-# 请确保这些 import 路径是正确的，或者将相关辅助函数直接复制到这个文件中
-# ==============================================================================
-from BioMiner.MolScribe.molscribe import MolGlyph
-# 假设 Translator 和 get_refactor, get_new_smiles 在 utils 或其他地方
-# from your_utils import Translator, get_refactor, get_new_smiles 
 
-# -----------------------------------------------------------
-# 为了代码可运行，这里模拟了你原本调用中需要的辅助函数结构
-# 如果你有具体的定义文件，请替换这里的 Mock/Import
-# -----------------------------------------------------------
+from BioMiner.MolScribe.molscribe import MolGlyph
+
 from BioMiner.commons.molglyph_utils import Translator, get_refactor, get_new_smiles
 
 # -----------------------------------------------------------
