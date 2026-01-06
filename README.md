@@ -202,6 +202,7 @@ Both two version takes the following input:
 - **config_path**, the path of config file, we provide a default config
 - **pdf**, the path of the pdf file or the pdf directory. 
 - **biovista_evaluate**, if the pdfs are in biovista (have labels), enable biovista evaluation
+- **--output_dir**, the result output directory
 
 ## Evaluation on BioVista and Result Reproducation
 
