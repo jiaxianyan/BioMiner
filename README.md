@@ -212,7 +212,7 @@ Both two version takes the following input:
 - 2. Downloading the six BioVista dataset, and unzip in the `BioVista` directory
 - 3. Adding `--biovista_evaluate` in the command line, running:
 ```
-python3 example.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs --biovista_evaluate --output_dir=./tmp/test_biovista_upgrade
+python3 example_open_source.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs --biovista_evaluate --output_dir=./tmp/test_biovista_upgrade
 ```
 
 **Output**:
