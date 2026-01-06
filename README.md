@@ -148,9 +148,9 @@ conda activate vllm_py310
 
 Our codes support users to choose MLLM they want to use.
 
-If you want to use BioMiner-Instruct, you do not need to further modify the config file. You should deploy BioMiner-Instruct locally and we recommend at least two A800 80G GPUs.
+If you want to use BioMiner-Instruct, you do not need to further modify the config file. You should deploy BioMiner-Instruct locally and **we recommend at least two A800 80G GPUs**.
 
-Otherwise, if you want to use closed-source MLLMs through api, you should config the `api_key` and `base_url` in config file `BioMiner/config/default.yaml` for calling MLLM. At this time, you only need one GPU, such as 4090 24G.
+Otherwise, if you want to use closed-source MLLMs through api, you should config the `api_key`, `base_url`, `text_mllm_type`, and `vision_mllm_type` in config file `BioMiner/config/default_open_source.yaml` for calling MLLM api. At this time, **you only need one GPU, such as 4090 24G**.
 
 Due to the copyright of papers, here, we only take two open access papers as an example to show the usage:
 
@@ -172,28 +172,28 @@ bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3
 
 ### Run inference given a pdf file
 ```
-python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs/40_6s8a.pdf 
+python3 example_open_source.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs/68_6r8r.pdf --output_dir=./tmp_output/demo_68_6r8r
 ```
 **Output (Top-10 lines)**:
 ```
-    protein ligand  type          value unit                                     smiles
-0     NOTUM      3  IC50             33   μM                  Cc1ccccc1OCC(=O)Nc1cccnc1
-1     NOTUM     38  IC50          0.032   μM  Cc1ccccc1OCC(=O)Nc1ccc2c(c1)CN(C(C)C)N=C2
-2     NOTUM     45  IC50          0.085   μM            Cc1ccccc1OCC(=O)Nc1ccc2cnccc2c1
-3     NOTUM      3  IC50            4.7   μM                  Cc1ccccc1OCC(=O)Nc1cccnc1
-18    NOTUM     21  IC50            1.6   μM                  Cc1ccccc1OCC(=O)Nc1ccccc1
-20    NOTUM     24  IC50           0.21   μM                Cc1ccccc1OCC(=O)Nc1ccn(C)n1
-21    NOTUM     26  IC50           0.33   μM          Cc1ccccc1OCC(=O)Nc1ccc2cc[nH]c2c1
-22    NOTUM     27  IC50            100   μM            Cc1ccccc1OCC(=O)Nc1ccc2nccnc2c1 
-23    NOTUM     28  IC50           0.68   μM          Cc1ccccc1OCC(=O)Nc1ccc2[nH]ccc2c1
-24    NOTUM     30  IC50           0.24   μM          Cc1ccccc1OCC(=O)Nc1ccc2c(c1)ncn2C
+   protein ligand  type  value unit                                  smiles
+1    NOTUM      3  IC50     33   µM               Cc1ccccc1OCC(=O)Nc1cccnc1
+17   NOTUM     19  IC50    180   µM       [H]C(Oc1ccccc1C)C(=O)N(C)c1cccnc1
+18   NOTUM     20  IC50    100   µM       [H]N(C(=O)C(C)Oc1ccccc1C)c1cccnc1
+19   NOTUM     34  IC50   0.27   µM       Cc1ccccc1OCC(=O)Nc1ccc2cnn(C)c2c1
+20   NOTUM     38  IC50  0.032   µM   Cc1ccccc1OCC(=O)Nc1ccc2cn(C(C)C)nc2c1
+21   NOTUM     39  IC50   0.12   µM       Cc1ccccc1OCC(=O)Nc1ccc2nn[nH]c2c1
+22   NOTUM     45  IC50  0.085   µM         Cc1ccccc1OCC(=O)Nc1ccc2cnccc2c1
+25   NOTUM     22  IC50    9.4   µM               Cc1ccccc1OCC(=O)Nc1cnccn1
+26   NOTUM     24  IC50     72   µM             Cc1ccccc1OCC(=O)Nc1ccn(C)n1
+27   NOTUM     26  IC50   0.21   µM       Cc1ccccc1OCC(=O)Nc1ccc2cc[nH]c2c1
 ...
 ...
 ```
 
 ### Run inference given a directory contains pdfs
 ```
-python3 example_open_source.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs 
+python3 example_open_source.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs --output_dir=./tmp_output/demo_directy
 ```
 
 ### Parameter Descriptor
@@ -206,11 +206,11 @@ Both two version takes the following input:
 ## Evaluation on BioVista and Result Reproducation
 
 ### Evaluation of Two End-to-end Tasks:
-- 1. Downloading the 500 BioVista papers in the `example/pdfs` directory
+- 1. Downloading the BioVista papers, and save the 450 papers of BioVista testing set in the `example/pdfs` directory
 - 2. Downloading the six BioVista dataset, and unzip in the `BioVista` directory
 - 3. Adding `--biovista_evaluate` in the command line, running:
 ```
-python3 example.py --config_path=BioMiner/config/default.yaml --pdf=example/pdfs --biovista_evaluate
+python3 example.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs --biovista_evaluate --output_dir=./tmp/test_biovista_upgrade
 ```
 
 **Output**:

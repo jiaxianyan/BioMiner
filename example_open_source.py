@@ -8,11 +8,15 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_path', type=str, default='BioMiner/config/default.yaml')
-    parser.add_argument('--pdf', type=str, default='example/pdfs')
+    parser.add_argument('--pdf', type=str)
+    parser.add_argument('--output_dir', type=str)
     parser.add_argument('--biovista_evaluate', action='store_true')
+
     args = parser.parse_args()
     
     config = get_config_easydict(args.config_path)
+
+    config.output_dir = args.output_dir
 
     model = BioMiner(config,
                      biovista_evaluate=args.biovista_evaluate)
