@@ -16,8 +16,8 @@ data:
   prompt_path: ./BioMiner/commons/prompts
 
 model:
-  base_url: https://aihubmix.com/v1
-  api_key: sk-di6EQiNDxyGzzoFa93389fA755B14eAfAf31B863F2E6C369
+  base_url: 
+  api_key: 
   mol_detection_model: moldetv2
   ocsr_model: molglyph
   merge_strategy: direct
