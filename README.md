@@ -166,7 +166,8 @@ python scripts/mineru_server.py # at tmux window 0
 python scripts/moldet_server.py # at tmux window 1
 python scripts/ocsr_server.py # at tmux window 2 
 
-conda activate vllm_py310
+
+conda activate vllm_py310 # start this server when using BioMiner-Instruct, otherwise skip 
 bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3
 
 ```
