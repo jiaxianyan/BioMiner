@@ -139,6 +139,9 @@ python download_models.py
 magic-pdf -p small_ocr.pdf -o ./output
 ```
 
+**Particularly,** in BioMiner, we keep to use old version MinerU, as the new version MinerU tends to split a whole figure into several subfigures, which destroy the compelete semantic. However, it seems the updation of MinerU leading to old version model checkpoints are unavailable.
+If you find the correct model weights cannot be downloaded by using the `download_models.py` script, you can directly download all models weights from this [Huggingface Repo](https://huggingface.co/jiaxianustc/BioMiner-MinerU-Model)
+
 #### 2. Install vllm env
 ```
 conda env create -f vllm_environment.yml
