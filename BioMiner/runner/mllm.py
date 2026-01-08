@@ -19,6 +19,7 @@ import sqlite3
 from py2opsin import py2opsin
 
 GPTSTPYEMODELS = ['gpt-4o', 'gpt-4o-mini', 'moonshot-v1-128k', 'gpt-4.1-mini']
+
 IPUAC_FILE_PATH = 'BioMiner/commons/1d_r_groups/group_inpuc.log'
 # RATIONALFORMULA_FILE_PATH = 'BioMiner/commons/1d_r_groups/group_chem_formula.log'
 RATIONALFORMULA_FILE_PATH = 'BioMiner/commons/1d_r_groups/group_chem_formula_merge.log'
@@ -135,7 +136,7 @@ def process_api_output(output):
 
 def full_structure_data_api_putput_to_list(data, mllm, index2smiles):
     data_list = []
-    if mllm in GPTSTPYEMODELS:
+    if mllm in GPTSTPYEMODELS or 'gpt' in mllm.lower():
         if 'data' not in data:
             return data_list
         data = data['data']
@@ -334,7 +335,7 @@ def zip_molecule(backbone_groups):
     
 def part_structure_data_api_putput_to_list(data, mllm, index2smiles):
     data_list = []
-    if mllm in GPTSTPYEMODELS:
+    if mllm in GPTSTPYEMODELS or 'gpt' in mllm.lower():
         if 'data' not in data:
             return data_list
         data = data['data']
@@ -421,7 +422,7 @@ def part_structure_data_api_putput_to_list(data, mllm, index2smiles):
 
 def bioactivity_data_api_output_to_list(data, mllm):
     data_list = []
-    if mllm in GPTSTPYEMODELS:
+    if mllm in GPTSTPYEMODELS or 'gpt' in mllm.lower():
         if 'data' not in data:
             return data_list
         data = data['data']
