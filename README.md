@@ -5,7 +5,7 @@
 - 2025/12/27 BioMiner Upgrade Version Release
     - **Biotriplet extraction F1 score increases to 0.32**
     - Releasing open-weight OCSR model **MolGlyph** (SOTA on BioVista)
-    - Releasing open-weight MLLM Model **BioMiner-Instruct**
+    - Releasing open-weight MLLM Model **BioMiner-Instruct** (32B Parameters)
     - Splitting Benchmark into **validation set and testing set** in a 1:9 ratio
     - Introducing **text normalization** for more faithful and robust evaluation
     - Improving cache mechanism of IUPAC OPSIN
@@ -133,7 +133,7 @@ magic-pdf --version
 magic-pdf -p small_ocr.pdf -o ./output
 # Install MinerU gpu version
 python3 -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
-pip install transformers==4.51.2
+pip3 install transformers==4.51.2
 # Download MinerU model checkpoints
 python download_models.py
 # for gpu version, it only takes several seconds to process a pdf
