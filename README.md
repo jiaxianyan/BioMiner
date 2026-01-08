@@ -165,19 +165,20 @@ Due to the copyright of papers, here, we only take two open access papers as an 
 # We run the demo experiments on 4 A800 80G GPUs
 # We recommend to deploy servers at background using tools such as tmux
 
+export PYTHONPATH=./
+
 conda activate BioMiner
 python scripts/mineru_server.py # at tmux window 0
 python scripts/moldet_server.py # at tmux window 1
 python scripts/ocsr_server.py # at tmux window 2 
 
-
 conda activate vllm_py310 # start this server when using BioMiner-Instruct, otherwise skip 
 bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3
-
 ```
 
 ### Run inference given a pdf file
 ```
+export PYTHONPATH=./
 python3 example_open_source.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs/68_6r8r.pdf --output_dir=./tmp_output/demo_68_6r8r
 ```
 **Output (Top-10 lines)**:
@@ -199,6 +200,7 @@ python3 example_open_source.py --config_path=BioMiner/config/default_open_source
 
 ### Run inference given a directory contains pdfs
 ```
+export PYTHONPATH=./
 python3 example_open_source.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs --output_dir=./tmp_output/demo_directy
 ```
 
@@ -217,6 +219,7 @@ Both two version takes the following input:
 - 2. Downloading the six BioVista dataset, and unzip in the `BioVista` directory
 - 3. Adding `--biovista_evaluate` in the command line, running:
 ```
+export PYTHONPATH=./
 python3 example_open_source.py --config_path=BioMiner/config/default_open_source.yaml --pdf=example/pdfs --biovista_evaluate --output_dir=./tmp/test_biovista_upgrade
 ```
 
