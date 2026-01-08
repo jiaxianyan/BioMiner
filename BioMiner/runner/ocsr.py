@@ -4,7 +4,7 @@ import re
 import torch
 import cv2
 from PIL import Image, ImageDraw, ImageFont
-from molscribe import MolScribe
+# from molscribe import MolScribe
 # from rxnscribe import MolDetect
 from huggingface_hub import hf_hub_download
 
