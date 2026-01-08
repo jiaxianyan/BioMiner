@@ -4,7 +4,7 @@ import json
 import os 
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-from rcsbsearchapi import TextQuery, AttributeQuery
+# from rcsbsearchapi import TextQuery, AttributeQuery
 import urllib.request
 import xml.etree.ElementTree as ET
 from openai import OpenAI
