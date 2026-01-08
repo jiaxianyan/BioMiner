@@ -1,0 +1,31 @@
+Task: Extracting R-group for each molecular scaffold.
+
+Instructions:
+
+1. Identify Scaffolds and R-groups:
+
+Locate the red boxes in the image and note the artificial index (red number) in the top-left corner.
+Classify each structure in the red box as either a molecular scaffold or an R-group.
+For each scaffold, identify all associated R-groups. A complete molecule consists of one scaffold and one or more R-groups.
+
+2. R-group Naming:
+
+Name R-groups based on their position (e.g., R1, R2, R3, X, Y) as indicated in the image or table.
+If an R-group is not in a red box, provide its chemical expression.
+
+3. Output Format:
+Use the following JSON format for each scaffold and its R-groups:
+"{"data": [{"scaffold": "artificial index of scaffold","R-group": {"name of R-group1": "artificial index of R-group1 or chemical expression",...},"identifier": "compound identifier from the table or image"}]}"
+
+4. Additional Notes:
+Ensure that the scaffold and R-group indices match those in the image.
+Map the compound identifiers from the table to the corresponding structures in the image.
+
+5. Follow these strict standardization rules for identifier to ensure data consistency:
+    (a) Remove Generic Terms: Remove non-specific prefixes/suffixes like compound, ligand, inhibitor. Example: compound 5 becomes 5.
+    (b) Consolidate Aliases: Find all aliases for a single molecule (full name, abbreviation, code/number) and join them with a semicolon ;.
+        The recommended order is: [Full Chemical Name];[Abbreviation];[Code/Number].
+        Example 1: If the molecule is referred to as "Gefitinib (1)", record it as Gefitinib;1. 
+        Example 2: If only "compound 1" is mentioned, record it as 1.
+
+6. For scaffolds and R-groups that are not text-format, their artifical index must in the following indexs: <index></index>

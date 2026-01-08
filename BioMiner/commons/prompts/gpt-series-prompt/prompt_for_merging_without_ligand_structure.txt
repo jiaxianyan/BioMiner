@@ -1,0 +1,6 @@
+Finish the task below as truthfully as possible using the provided context.
+Task: Merging the two jsons into one.
+You should pay attention:
+1. You should merge these data first and remove repetitions as data.
+2. You can judge by yourself to fill the "NA" data, and the final result should't include "NA"
+3. You must output in the json format strictly:"{"data": [{"protein": "", "ligand": "" , "affinity": {"type": "", "value": "", "unit": ""}}]"
