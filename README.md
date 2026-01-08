@@ -133,6 +133,7 @@ magic-pdf --version
 magic-pdf -p small_ocr.pdf -o ./output
 # Install MinerU gpu version
 python3 -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+pip install transformers==4.51.2
 # Download MinerU model checkpoints
 python download_models.py
 # for gpu version, it only takes several seconds to process a pdf
@@ -140,7 +141,7 @@ magic-pdf -p small_ocr.pdf -o ./output
 ```
 
 **Particularly,** in BioMiner, we keep to use old version MinerU, as the new version MinerU tends to split a whole figure into several subfigures, which destroy the compelete semantic. However, it seems the updation of MinerU leading to old version model checkpoints are unavailable.
-If you find the correct model weights cannot be downloaded by using the `download_models.py` script, you can directly download all models weights from this [Huggingface Repo](https://huggingface.co/jiaxianustc/BioMiner-MinerU-Model)
+If you find the correct model weights cannot be downloaded by using the `download_models.py` script, you can directly download all models weights from this [Huggingface Repo](https://huggingface.co/jiaxianustc/BioMiner-MinerU-Model) and save the model weights to your MinerU cache path.
 
 #### 2. Install vllm env
 ```
