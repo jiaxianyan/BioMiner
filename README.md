@@ -122,22 +122,14 @@ We provide the yaml files to help install environment.
 conda env create -f main_environment.yml
 conda activate BioMiner
 
-# Install MinerU. 
 # Prepare MinerU config json
 mv magic-pdf.json ~
-# Install MinerU v1.3.1 (cpu version first)
-pip3 install -U magic-pdf[full]==1.3.1 --extra-index-url https://wheels.myhloli.com
-# Check if install cpu version successfully
+# Check if install MinerU v1.3.1 gpu version successfully
 magic-pdf --version
-# for cpu version, it takes several minutes to process a pdf
-magic-pdf -p small_ocr.pdf -o ./output
-# Install MinerU gpu version
-python3 -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
-pip3 install transformers==4.51.2
 # Download MinerU model checkpoints
 python download_models.py
-# for gpu version, it only takes several seconds to process a pdf
-magic-pdf -p small_ocr.pdf -o ./output
+# it only takes several seconds to process a pdf for gpu version
+magic-pdf -p example/pdfs/40_6s8a.pdf -o ./output
 ```
 
 **Particularly,** in BioMiner, we keep to use old version MinerU, as the new version MinerU tends to split a whole figure into several subfigures, which destroy the compelete semantic. However, it seems the updation of MinerU leading to old version model checkpoints are unavailable.
@@ -168,12 +160,12 @@ Due to the copyright of papers, here, we only take two open access papers as an 
 export PYTHONPATH=./
 
 conda activate BioMiner
-python scripts/mineru_server.py # at tmux window 0
-python scripts/moldet_server.py # at tmux window 1
-python scripts/ocsr_server.py # at tmux window 2 
+python scripts/mineru_server.py # at tmux window 0 or use nohup
+python scripts/moldet_server.py # at tmux window 1 or use nohup
+python scripts/ocsr_server.py # at tmux window 2  or use nohup
 
 conda activate vllm_py310 # start this server when using BioMiner-Instruct, otherwise skip 
-bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3
+bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3 or use nohup
 ```
 
 ### Run inference given a pdf file
