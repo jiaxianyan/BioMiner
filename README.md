@@ -15,7 +15,7 @@
     - Biotriplet extraction F1 score 0.22
 
 ## Introduction
-This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v1).
+This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v2).
 If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
 
 - We introduce **BioMiner**, a multi-modal system integrating multi-modal large language models (MLLMs), domain-specific models (DSMs), and domain tools (DTs) to automatically extract protein-ligand-bioactivity triplets from thousands to potentially millions of publications at high throughput (about 20 seconds/paper on 4 A800 80G GPUs). 
