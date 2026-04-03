@@ -12,7 +12,7 @@
 
 
 ## Changelog
-- 2025/12/27 [BioMiner Interactive User Interface (UI) Release](#interactive-user-interface)
+- 2026/4/3 [BioMiner Interactive User Interface (UI) Release](#interactive-user-interface)
     - Releasing [interactive user interface](#interactive-user-interface) for non-command deployment and better result analysis
 
 - 2025/12/27 BioMiner Upgrade Version Release
@@ -355,7 +355,7 @@ python3 biovista_component_evaluate.py --config_path=BioVista/config/evaluate.ya
 Technology; Infinite Intelligence Pharma
 
 ## TODO
-- [ ] Online web
+- [x] Online web
 - [ ] BioMiner pypi install
 - [ ] BioMiner patent-version 
 - [x] Open-source OCSR model MolGlyph
