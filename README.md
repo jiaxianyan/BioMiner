@@ -1,5 +1,16 @@
-![logo](visualization/logo.jpg)
-# BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature
+<div align="center">
+
+<img src="visualization/logo.jpg" alt="BioMiner" width="220" />
+
+
+**A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature**
+
+[![Version](https://img.shields.io/badge/version-1.0.0-0366d6?style=flat-square)](#changelog)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Paper](https://img.shields.io/badge/paper-bioRxiv-red?style=flat-square)](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v2)
+
+</div>
+
 
 ## Changelog
 - 2025/12/27 [BioMiner Interactive User Interface (UI) Release](#interactive-user-interface)
@@ -16,6 +27,33 @@
 
 - 2025/4/23 BioMiner Initial Version Release
     - Biotriplet extraction F1 score 0.22
+
+## Contents
+
+- [Changelog](#changelog)
+- [Introduction](#introduction)
+  - [Overview of BioMiner and BioVista](#overview-of-biominer-and-biovista)
+  - [BioMiner's Performance on BioVista](#biominers-performance-on-biovista)
+- [Statistics and Access of BioVista](#statistics-and-access-of-biovista)
+- [Statistics and Access of BioMiner Constructed Database](#statistics-and-access-of-biominer-constructed-database)
+- [Installation of BioMiner](#installation-of-biominer)
+  - [Running Installation](#running-installation)
+- [Usage of BioMiner](#usage-of-biominer)
+  - [Start biominer server](#start-biominer-server)
+  - [Interactive User Interface](#interactive-user-interface)
+  - [Run inference given a pdf file](#run-inference-given-a-pdf-file)
+  - [Run inference given a directory contains pdfs](#run-inference-given-a-directory-contains-pdfs)
+  - [Parameter Descriptor](#parameter-descriptor)
+- [Evaluation on BioVista and Result Reproducation](#evaluation-on-biovista-and-result-reproducation)
+  - [Evaluation of Two End-to-end Tasks:](#evaluation-of-two-end-to-end-tasks)
+  - [Evaluation of Four Component-level Tasks:](#evaluation-of-four-component-level-tasks)
+- [Contributors](#contributors)
+- [TODO](#todo)
+- [Acknowledgement](#acknowledgement)
+- [Contact](#contact)
+- [License](#license)
+- [Citation](#citation)
+
 
 ## Introduction
 This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v2).
