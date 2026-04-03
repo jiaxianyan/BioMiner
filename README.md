@@ -2,6 +2,9 @@
 # BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature
 
 ## Changelog
+- 2025/12/27 BioMiner Interactive User Interface (UI) Release
+    - Releasing interactive user interface for non-command deployment and better result analysis
+
 - 2025/12/27 BioMiner Upgrade Version Release
     - **Biotriplet extraction F1 score increases to 0.32**
     - Releasing open-weight OCSR model **MolGlyph** (SOTA on BioVista)
@@ -167,6 +170,13 @@ python scripts/ocsr_server.py # at tmux window 2  or use nohup
 conda activate vllm_py310 # start this server when using BioMiner-Instruct, otherwise skip 
 bash scripts/run_local_vllm_server_biominer_instruct.bash # at tmux window 3 or use nohup
 ```
+
+### Interactive User Interface
+Currently, we provide interative user interface for non-command deployment and better result analysis.
+
+Refer [README](BioMiner_UI/README.md) for more instructions.
+
+<img src="visualization/biominer_ui.png" alt="BioMiner_UI" width="80%" />
 
 ### Run inference given a pdf file
 ```

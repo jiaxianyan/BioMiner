@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BioMiner 交互式界面</title>
+  <link rel="stylesheet" href="static/style.css" />
+</head>
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1><img src="/api/logo" alt="BioMiner logo" class="brand-logo" /></h1>
+      <p class="subtitle" data-i18n="header.subtitle">从文献中自动挖掘蛋白-配体生物活性数据</p>
+      <div class="lang-switch" role="group">
+        <span class="lang-label" data-i18n="lang.label">语言</span>
+        <button type="button" class="btn small lang-btn active" data-lang="zh" id="btnLangZh" aria-pressed="true" data-i18n="lang.zh">中文</button>
+        <button type="button" class="btn small lang-btn" data-lang="en" id="btnLangEn" aria-pressed="false" data-i18n="lang.en">English</button>
+      </div>
+    </header>
+
+    <nav class="sheet-tabs" role="tablist" data-i18n-aria="nav.tablist">
+      <button type="button" class="sheet-tab active" role="tab" id="sheetTabInput" aria-selected="true" data-sheet="input" data-i18n="nav.input">输入</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabRun" aria-selected="false" data-sheet="run" data-i18n="nav.run">运行推理</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabDetection" aria-selected="false" data-sheet="detection" data-i18n="nav.detection">化学结构识别</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabMarkushFull" aria-selected="false" data-sheet="markushFull" data-i18n="nav.markushFull">Full 分子结构</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabMarkushPart" aria-selected="false" data-sheet="markushPart" data-i18n="nav.markushPart">Part Markush</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabActivity" aria-selected="false" data-sheet="activity" data-i18n="nav.activityText">文本活性抽取</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabActivityImage" aria-selected="false" data-sheet="activityImage" data-i18n="nav.activityImage">图表活性抽取</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabActivityGivenStructure" aria-selected="false" data-sheet="activityGivenStructure" data-i18n="nav.activityGivenStructure">结构条件活性抽取</button>
+      <button type="button" class="sheet-tab" role="tab" id="sheetTabResults" aria-selected="false" data-sheet="results" data-i18n="nav.results">结果预览</button>
+    </nav>
+
+    <main class="main sheet-main">
+      <!-- Sheet: 输入 -->
+      <div id="sheetInput" class="sheet-panel active" role="tabpanel" aria-labelledby="sheetTabInput" data-sheet="input">
+      <section class="row row-input">
+        <div class="card card-pdf-input">
+          <h2 data-i18n="input.h1pdf">1. 输入 PDF</h2>
+          <div class="form-row">
+            <label data-i18n="input.pdfPath">PDF 路径（相对项目根）</label>
+            <div class="input-group">
+              <input type="text" id="pdfPath" placeholder="example/pdfs/68_6r8r.pdf" />
+              <button type="button" id="btnExamplePdf" class="btn secondary" data-i18n="input.useExample">使用示例</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label data-i18n="input.uploadPdf">或上传 PDF 文件</label>
+            <div class="file-input-custom">
+              <!-- 原生 file 控件由浏览器/系统语言渲染，无法随站点语言切换；用自定义按钮 + 文案替代 -->
+              <input type="file" id="pdfFile" class="file-input-native" accept=".pdf" tabindex="-1" aria-hidden="true" />
+              <button type="button" class="btn secondary file-input-fake-btn" id="btnPdfFilePick" data-i18n="input.chooseFile">选择文件</button>
+              <span id="pdfFileNameDisplay" class="file-input-status"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <button type="button" id="btnPreviewPdf" class="btn secondary" data-i18n="input.previewPdf">预览 PDF</button>
+          </div>
+        </div>
+        <div class="card card-pdf-preview">
+          <div id="panelPdfPreview" class="preview-panel">
+            <div id="pdfPreviewWrap" class="pdf-preview-wrap">
+              <p id="pdfPreviewPlaceholder" class="pdf-preview-placeholder" data-i18n="input.placeholderPreview">选择或输入 PDF 路径后点击「预览 PDF」</p>
+              <iframe id="pdfPreviewIframe" class="pdf-preview-iframe hidden" data-i18n-title="common.docPdfTitle" title="文档 PDF 预览"></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. 输出与配置 -->
+      <section class="card">
+        <h2 data-i18n="input.h2out">2. 输出与配置</h2>
+        <div class="form-row">
+          <label data-i18n="input.outputDir">输出目录（相对项目根）</label>
+          <input type="text" id="outputDir" value="tmp/test_ui" placeholder="tmp_output/demo_ui" />
+        </div>
+        <div class="form-row">
+          <label data-i18n="input.configPath">配置文件路径</label>
+          <input type="text" id="configPath" value="BioMiner/config/default_open_source.yaml" placeholder="BioMiner/config/default_open_source.yaml" />
+        </div>
+        <details class="config-details">
+          <summary data-i18n="input.apiSummary">API 配置（使用闭源 MLLM 时填写）</summary>
+          <div class="form-row">
+            <label>base_url</label>
+            <input type="text" id="baseUrl" placeholder="https://api.openai.com/v1" />
+          </div>
+          <div class="form-row">
+            <label>api_key</label>
+            <input type="password" id="apiKey" placeholder="sk-..." />
+          </div>
+          <div class="form-row">
+            <label>text_mllm_type</label>
+            <input type="text" id="textMllmType" placeholder="local-biominer-instruct 或 API 模型名" />
+          </div>
+          <div class="form-row">
+            <label>vision_mllm_type</label>
+            <input type="text" id="visionMllmType" placeholder="local-biominer-instruct 或 API 模型名" />
+          </div>
+          <button type="button" id="btnLoadConfig" class="btn secondary" data-i18n="input.loadConfig">从配置文件加载</button>
+          <button type="button" id="btnSaveConfig" class="btn secondary" data-i18n="input.saveConfig">保存到配置文件</button>
+        </details>
+      </section>
+      </div>
+
+      <!-- Sheet: 运行推理 -->
+      <div id="sheetRun" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabRun" data-sheet="run">
+      <section class="card">
+        <h2 data-i18n="run.title">运行推理</h2>
+        <p class="hint" data-i18n="run.hint">请确保已按 README 启动 mineru_server、moldet_server、ocsr_server；使用 BioMiner-Instruct 时还需启动 vllm 服务。</p>
+        <button type="button" id="btnRun" class="btn primary" data-i18n="run.btn">运行 BioMiner</button>
+        <div id="jobInfo" class="job-info hidden">
+          <span><span data-i18n="run.jobId">任务 ID:</span> <strong id="jobId"></strong></span>
+          <span><span data-i18n="run.status">状态:</span> <strong id="jobStatus"></strong></span>
+          <button type="button" id="btnRefreshJob" class="btn small" data-i18n="run.refresh">刷新状态</button>
+        </div>
+        <pre id="logOutput" class="log-output"></pre>
+      </section>
+      </div>
+
+      <!-- Sheet: 化学结构识别 -->
+      <div id="sheetDetection" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabDetection" data-sheet="detection">
+      <section class="card">
+        <h2 data-i18n="detection.title">化学结构识别</h2>
+        <p class="hint" data-i18n="detection.hint">运行完样例后，点击「展示分子检测框」从 stage_one.pkl 加载页图与 bboxes_with_pred_smiless，在画布上绘制；点击图中分子框可查看 page、index、bbox、smiles。</p>
+        <div class="form-row auto-result-dir-row">
+          <label data-i18n="detection.resultDir">结果目录（与上面一致）</label>
+          <div class="input-group">
+            <input type="text" id="detectionOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_ui" />
+            <button type="button" id="btnShowMolBbox" class="btn primary" data-i18n="detection.showBbox">展示分子检测框</button>
+          </div>
+        </div>
+        <div id="detectionDocPageRow" class="form-row detection-doc-page-row hidden">
+          <label data-i18n="detection.docPage">文档 / 页码</label>
+          <div class="detection-selects">
+            <select id="detectionDocSelect">
+              <option value="" data-i18n="detection.selectDoc">选择文档</option>
+            </select>
+            <select id="detectionPageSelect">
+              <option value="" data-i18n="detection.selectPage">选择页码</option>
+            </select>
+          </div>
+        </div>
+        <div id="detectionImageWrap" class="detection-two-col hidden">
+          <div class="detection-canvas-col">
+            <div class="zoom-toolbar" data-i18n-aria="detection.zoomAria">
+              <button type="button" id="detectionZoomOut" class="btn small secondary" data-i18n-title="detection.zoomOut">-</button>
+              <button type="button" id="detectionZoomIn" class="btn small secondary" data-i18n-title="detection.zoomIn">+</button>
+              <button type="button" id="detectionZoomReset" class="btn small secondary" data-i18n-title="detection.zoomReset">100%</button>
+              <button type="button" id="detectionZoomFit" class="btn small secondary" data-i18n="detection.zoomFitBtn" data-i18n-title="detection.zoomFit">适配宽度</button>
+              <span id="detectionZoomLabel" class="zoom-label">100%</span>
+            </div>
+            <div class="detection-canvas-scroll" data-i18n-aria="detection.canvasAria">
+              <canvas id="detectionCanvas"></canvas>
+            </div>
+          </div>
+          <div class="detection-info-col">
+            <div id="detectionBboxListWrap" class="detection-bbox-list-wrap">
+              <p class="detection-info-label" data-i18n="detection.bboxListTitle">所有框的基本信息</p>
+              <div id="detectionBboxList" class="detection-bbox-list"></div>
+              <p id="detectionBboxListEmptyHint" class="detection-bbox-list-empty-hint hidden" data-i18n="detection.bboxListEmpty">当前页无分子框</p>
+            </div>
+            <div id="detectionKetcherCol" class="detection-ketcher-col hidden">
+              <button type="button" id="detectionBackToBboxList" class="btn secondary" data-i18n="detection.backList">返回「所有框的基本信息」</button>
+              <div id="detectionBboxCropWrap" class="detection-bbox-crop-wrap hidden">
+                <p class="detection-info-label" data-i18n="detection.cropTitle">分子框原图</p>
+                <img id="detectionBboxCropImg" class="detection-bbox-crop-img" alt="" data-i18n-alt="detection.cropTitle" />
+              </div>
+              <input type="text" id="smiles-input" class="detection-ketcher-input" placeholder="SMILES" aria-label="SMILES" />
+              <button type="button" id="draw-button" class="btn small" data-i18n="detection.draw">绘制</button>
+              <button type="button" id="btnSaveSmiles" class="btn small secondary" data-i18n="detection.saveSmiles">保存SMILES</button>
+              <div class="ketcher-iframe-wrap">
+                <iframe id="ketcher-iframe" src="static/ketcher-standalone-3.7.0/standalone/index.html" data-i18n-title="detection.ketcherTitle" title="Ketcher 分子编辑器"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="detectionPlaceholder" class="detection-placeholder" data-i18n="detection.placeholder">请先点击「展示分子检测框」加载页图与分子框（点击框可在右侧查看结构）。</p>
+      </section>
+      </div>
+
+      <!-- Sheet: Full 分子结构 -->
+      <div id="sheetMarkushFull" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabMarkushFull" data-sheet="markushFull">
+      <section class="card">
+        <h2 data-i18n="markushFull.title">Full 数据（完整分子结构）</h2>
+        <p class="hint" data-i18n="markushFull.hint">运行推理后，从结果目录加载分子指代与 Markush 抽取结果，按页分开展示完整分子结构（Full）数据。</p>
+        <div class="form-row" style="display:none;">
+          <label data-i18n="markushFull.hiddenDir">结果目录（与运行推理输出目录一致）</label>
+          <div class="input-group">
+            <input type="text" id="markushOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_ui" />
+            <button type="button" id="btnLoadMarkush" class="btn primary" data-i18n="markushFull.load">加载分子指代/Markush 结果</button>
+          </div>
+        </div>
+        <div id="markushDocPageRow" class="form-row markush-doc-page-row hidden">
+          <label data-i18n="detection.docPage">文档 / 页码</label>
+          <div class="markush-selects">
+            <select id="markushDocSelect">
+              <option value="" data-i18n="detection.selectDoc">选择文档</option>
+            </select>
+            <select id="markushPageSelect">
+              <option value="" data-i18n="detection.selectPage">选择页码</option>
+            </select>
+          </div>
+        </div>
+        <div id="markushImageResultRow" class="sheet-image-result-row sheet-image-result-row--half hidden">
+          <div class="sheet-image-col sheet-image-col--viz-toolbar">
+            <div id="markushPageImageWrap" class="page-image-wrap page-image-viz-wrap hidden">
+              <div class="zoom-toolbar" data-i18n-aria="detection.zoomAria">
+                <button type="button" id="markushZoomOut" class="btn small secondary" data-i18n-title="detection.zoomOut">-</button>
+                <button type="button" id="markushZoomIn" class="btn small secondary" data-i18n-title="detection.zoomIn">+</button>
+                <button type="button" id="markushZoomReset" class="btn small secondary" data-i18n-title="detection.zoomReset">100%</button>
+                <button type="button" id="markushZoomFit" class="btn small secondary" data-i18n="detection.zoomFitBtn" data-i18n-title="detection.zoomFit">适配宽度</button>
+                <span id="markushZoomLabel" class="zoom-label">100%</span>
+              </div>
+              <div class="page-image-scroll" data-i18n-aria="markushFull.pageScrollAria">
+                <p class="page-image-placeholder" data-i18n="markushFull.placeholder">选择文档与页码后显示 Full 可视化（md_merge_*_yolo_distinguish_full_markush_after_ocsr）</p>
+                <img id="markushPageImage" class="page-image-img" alt="" data-i18n-alt="markushFull.pageImgAlt" />
+              </div>
+            </div>
+          </div>
+          <div class="sheet-result-col">
+            <div id="markushContent" class="markush-content hidden">
+              <div id="markushFullTableWrap" class="markush-table-wrap hidden" aria-hidden="true">
+                <table id="markushFullTable" class="markush-table">
+                  <thead id="markushFullThead"><tr></tr></thead>
+                  <tbody id="markushFullTbody"></tbody>
+                </table>
+              </div>
+              <div id="markushFullDetails" class="markush-coref-panel hidden">
+                <div class="markush-coref-toolbar">
+                  <p class="markush-coref-label" data-i18n="markushFull.corefLabel">指代 (coreference)</p>
+                  <button type="button" id="btnSaveMarkushFullCoref" class="btn small secondary" data-i18n="markushFull.saveCoref">保存指代</button>
+                </div>
+                <p id="markushFullCorefHint" class="markush-coref-hint hidden" role="status"></p>
+                <textarea id="markushFullCoref" class="markush-json markush-json--editable" rows="14" spellcheck="false" wrap="off" data-i18n-aria="markushFull.corefAria"></textarea>
+              </div>
+            </div>
+            <p id="markushPlaceholder" class="markush-placeholder" data-i18n="markushFull.wait">请先点击「加载分子指代/Markush 结果」并选择文档与页码。</p>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <!-- Sheet: Part Markush -->
+      <div id="sheetMarkushPart" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabMarkushPart" data-sheet="markushPart">
+      <section class="card">
+        <h2 data-i18n="markushPart.title">Part 数据（Markush scaffold/取代基）</h2>
+        <p class="hint" data-i18n="markushPart.hint">运行推理后，从结果目录加载分子指代与 Markush 抽取结果，按页分开展示 Part（scaffold/取代基）数据。</p>
+        <div class="form-row" style="display:none;">
+          <label data-i18n="markushFull.hiddenDir">结果目录（与运行推理输出目录一致）</label>
+          <div class="input-group">
+            <input type="text" id="markushPartOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_ui" />
+            <button type="button" id="btnLoadMarkushPart" class="btn primary" data-i18n="markushFull.load">加载分子指代/Markush 结果</button>
+          </div>
+        </div>
+        <div id="markushPartDocPageRow" class="form-row markush-doc-page-row hidden">
+          <label data-i18n="detection.docPage">文档 / 页码</label>
+          <div class="markush-selects">
+            <select id="markushPartDocSelect">
+              <option value="" data-i18n="detection.selectDoc">选择文档</option>
+            </select>
+            <select id="markushPartPageSelect">
+              <option value="" data-i18n="detection.selectPage">选择页码</option>
+            </select>
+          </div>
+        </div>
+        <div id="markushPartImageResultRow" class="sheet-image-result-row sheet-image-result-row--half hidden">
+          <div class="sheet-image-col sheet-image-col--viz-toolbar">
+            <div id="markushPartPageImageWrap" class="page-image-wrap page-image-viz-wrap hidden">
+              <div class="zoom-toolbar" data-i18n-aria="detection.zoomAria">
+                <button type="button" id="markushPartZoomOut" class="btn small secondary" data-i18n-title="detection.zoomOut">-</button>
+                <button type="button" id="markushPartZoomIn" class="btn small secondary" data-i18n-title="detection.zoomIn">+</button>
+                <button type="button" id="markushPartZoomReset" class="btn small secondary" data-i18n-title="detection.zoomReset">100%</button>
+                <button type="button" id="markushPartZoomFit" class="btn small secondary" data-i18n="detection.zoomFitBtn" data-i18n-title="detection.zoomFit">适配宽度</button>
+                <span id="markushPartZoomLabel" class="zoom-label">100%</span>
+              </div>
+              <div class="page-image-scroll" data-i18n-aria="markushPart.pageScrollAria">
+                <p class="page-image-placeholder" data-i18n="markushPart.placeholder">选择文档与页码后显示 Part Markush 可视化（md_merge_*_yolo_distinguish_full_markush_after_ocsr）</p>
+                <img id="markushPartPageImage" class="page-image-img" alt="" data-i18n-alt="markushPart.pageImgAlt" />
+              </div>
+            </div>
+          </div>
+          <div class="sheet-result-col">
+            <div id="markushPartContent" class="markush-content hidden">
+              <div id="markushPartTableWrap" class="markush-table-wrap hidden" aria-hidden="true">
+                <table id="markushPartTable" class="markush-table">
+                  <thead id="markushPartThead"><tr></tr></thead>
+                  <tbody id="markushPartTbody"></tbody>
+                </table>
+              </div>
+              <div id="markushPartDetails" class="markush-coref-panel hidden">
+                <div class="markush-coref-toolbar">
+                  <p class="markush-coref-label" data-i18n="markushFull.corefLabel">指代 (coreference)</p>
+                  <button type="button" id="btnSaveMarkushPartCoref" class="btn small secondary" data-i18n="markushFull.saveCoref">保存指代</button>
+                </div>
+                <p id="markushPartCorefHint" class="markush-coref-hint hidden" role="status"></p>
+                <textarea id="markushPartCoref" class="markush-json markush-json--editable" rows="14" spellcheck="false" wrap="off" data-i18n-aria="markushPart.corefAria"></textarea>
+              </div>
+            </div>
+            <p id="markushPartPlaceholder" class="markush-placeholder" data-i18n="markushPart.wait">请先点击「加载分子指代/Markush 结果」并选择文档与页码。</p>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <!-- Sheet: 文本活性抽取结果（整体） -->
+      <div id="sheetActivity" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabActivity" data-sheet="activity">
+      <section class="card">
+        <h2 data-i18n="activityText.title">文本活性抽取（整体）</h2>
+        <p class="hint" data-i18n="activityText.hint">从全文文本中抽取的蛋白-配体活性结果，以整体表格形式查看。</p>
+
+        <div class="form-row auto-result-dir-row">
+            <label data-i18n="activityText.resultDir">结果目录（与运行推理输出目录一致）</label>
+            <div class="input-group">
+              <input type="text" id="activityOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_ui" />
+              <button type="button" id="btnLoadActivityText" class="btn primary" data-i18n="activityText.load">加载文本活性结果</button>
+            </div>
+          </div>
+          <div id="activityDocFilterRow" class="form-row markush-doc-page-row hidden">
+            <label data-i18n="activityText.doc">文档</label>
+            <div class="markush-selects">
+              <select id="activityDocFilter">
+                <option value="" data-i18n="activityText.allDocs">全部</option>
+              </select>
+            </div>
+          </div>
+          <div id="activityTextImageResultRow" class="sheet-image-result-row">
+            <div class="sheet-image-col sheet-image-col--viz-toolbar">
+              <div id="activityTextDocPdfWrap" class="page-image-wrap activity-doc-pdf-wrap page-image-viz-wrap hidden">
+                <div class="page-image-scroll" data-i18n-aria="activityText.pdfPreviewAria">
+                  <p id="activityTextDocPdfPlaceholder" class="page-image-placeholder" data-i18n="activityText.pdfPlaceholder">选择文档后预览该文档 PDF</p>
+                  <iframe id="activityTextDocPdfIframe" class="pdf-preview-iframe hidden" data-i18n-title="common.docPdfTitle" title="文档 PDF 预览"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-result-col">
+              <div class="table-wrap">
+                <table id="activityTable" class="results-table">
+                  <thead><tr id="activityThead"></tr></thead>
+                  <tbody id="activityTbody"></tbody>
+                </table>
+              </div>
+            <button type="button" id="btnSaveActivityTextEdits" class="btn small secondary" style="margin-top: 0.5rem;" data-i18n="activityText.saveEdits">保存修改</button>
+              <div id="activityPaginationRow" class="activity-pagination-row hidden">
+                <span id="activityPaginationInfo" class="activity-pagination-info"></span>
+                <div class="activity-pagination-btns">
+                  <button type="button" id="btnActivityFirstPage" class="btn small" data-i18n="common.first">首页</button>
+                  <button type="button" id="btnActivityPrevPage" class="btn small" data-i18n="common.prev">上一页</button>
+                  <button type="button" id="btnActivityNextPage" class="btn small" data-i18n="common.next">下一页</button>
+                  <button type="button" id="btnActivityLastPage" class="btn small" data-i18n="common.last">末页</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      </section>
+      </div>
+
+      <!-- Sheet: 图表活性抽取（按文档展示全部） -->
+      <div id="sheetActivityImage" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabActivityImage" data-sheet="activityImage">
+      <section class="card">
+        <h2 data-i18n="activityImg.title">图表活性抽取（按文档展示全部）</h2>
+        <p class="hint" data-i18n="activityImg.hint">选择文档后直接合并显示该文档下所有图表/表格的活性抽取结果。</p>
+        <section class="card" style="margin-top: 0.75rem;">
+          <div class="form-row auto-result-dir-row">
+            <label data-i18n="activityText.resultDir">结果目录（与运行推理输出目录一致）</label>
+            <div class="input-group">
+              <input type="text" id="activityImageOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_ui" />
+              <button type="button" id="btnLoadActivityImage" class="btn primary" data-i18n="activityImg.load">加载图表活性结果</button>
+            </div>
+          </div>
+          <div id="activityDocPageRow" class="form-row markush-doc-page-row hidden">
+            <label data-i18n="activityText.doc">文档</label>
+            <div class="markush-selects">
+              <select id="activityDocSelect">
+                <option value="" data-i18n="detection.selectDoc">选择文档</option>
+              </select>
+            </div>
+          </div>
+          <div id="activityImageImageResultRow" class="sheet-image-result-row hidden">
+            <div class="sheet-image-col sheet-image-col--viz-toolbar">
+              <div id="activityImagePageImageWrap" class="page-image-wrap activity-doc-pdf-wrap page-image-viz-wrap hidden">
+                <div class="page-image-scroll" data-i18n-aria="activityText.pdfPreviewAria">
+                  <p id="activityImageDocPdfPlaceholder" class="page-image-placeholder" data-i18n="activityText.pdfPlaceholder">选择文档后预览该文档 PDF</p>
+                  <iframe id="activityImageDocPdfIframe" class="pdf-preview-iframe hidden" data-i18n-title="common.docPdfTitle" title="文档 PDF 预览"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-result-col">
+              <div class="table-wrap">
+                <table id="activityImageTable" class="results-table">
+                  <thead><tr id="activityImageThead"></tr></thead>
+                  <tbody id="activityImageTbody"></tbody>
+                </table>
+              </div>
+              <button type="button" id="btnSaveActivityImageEdits" class="btn small secondary" style="margin-top: 0.5rem;" data-i18n="activityImg.saveEdits">保存修改</button>
+              <p id="activityImagePlaceholder" class="markush-placeholder" data-i18n="activityImg.placeholder">请先点击「加载图表活性结果」，然后选择文档。</p>
+            </div>
+          </div>
+        </section>
+      </section>
+      </div>
+
+      <!-- Sheet: 结构条件活性抽取 -->
+      <div id="sheetActivityGivenStructure" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabActivityGivenStructure" data-sheet="activityGivenStructure">
+      <section class="card">
+        <h2 data-i18n="givenStruct.title">结构条件活性抽取</h2>
+        <div class="form-row auto-result-dir-row">
+          <label data-i18n="givenStruct.resultDir">结果目录（与运行推理输出目录一致后点“加载结果”）</label>
+          <div class="input-group">
+            <input type="text" id="givenStructureOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_ui" />
+            <button type="button" id="btnLoadGivenStructure" class="btn primary" data-i18n="givenStruct.load">加载结果</button>
+          </div>
+        </div>
+        <div id="givenStructureSummary" class="results-summary hidden"></div>
+        <div id="givenStructureDocFilterRow" class="form-row markush-doc-page-row hidden">
+          <label data-i18n="givenStruct.doc">文档</label>
+          <div class="markush-selects">
+            <select id="givenStructureDocFilter">
+            </select>
+          </div>
+        </div>
+        <div id="givenStructureImageResultRow" class="sheet-image-result-row hidden">
+          <div class="sheet-image-col sheet-image-col--viz-toolbar">
+            <div id="givenStructureDocPdfWrap" class="page-image-wrap activity-doc-pdf-wrap page-image-viz-wrap hidden">
+              <div class="page-image-scroll" data-i18n-aria="activityText.pdfPreviewAria">
+                <p id="givenStructureDocPdfPlaceholder" class="page-image-placeholder" data-i18n="activityText.pdfPlaceholder">选择文档后预览该文档 PDF</p>
+                <iframe id="givenStructureDocPdfIframe" class="pdf-preview-iframe hidden" data-i18n-title="common.docPdfTitle" title="文档 PDF 预览"></iframe>
+              </div>
+            </div>
+          </div>
+          <div class="sheet-result-col">
+            <div id="givenStructureGivenSmilesWrap" class="given-structure-given-smiles hidden" aria-live="polite">
+              <div class="given-structure-given-smiles-head" data-i18n="givenStruct.givenHead">Given 配体结构（RDKit 2D，用于相似度计算的参考 SMILES）</div>
+              <div id="givenStructurePdbIdLine" class="given-structure-pdb-id hidden">
+                <span class="given-structure-pdb-id-label" data-i18n="givenStruct.pdbIdLabel">Complex PDB ID</span>
+                <code id="givenStructurePdbIdValue" class="given-structure-pdb-id-value"></code>
+                <a
+                  id="givenStructurePdbIdLink"
+                  class="given-structure-pdb-id-link hidden"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-i18n="givenStruct.rcsbLink"
+                  >RCSB 结构页</a
+                >
+              </div>
+              <div id="givenStructurePdbTitleLine" class="given-structure-pdb-title hidden">
+                <span class="given-structure-pdb-title-label" data-i18n="givenStruct.pdbTitleLabel">PDB Title</span>
+                <p id="givenStructurePdbTitleValue" class="given-structure-pdb-title-value"></p>
+              </div>
+              <div id="givenStructureGivenSmilesFigure" class="given-structure-given-smiles-figure">
+                <img id="givenStructureGivenSmilesImg" class="given-structure-given-smiles-img hidden" alt="" data-i18n-alt="givenStruct.givenImgAlt" />
+                <div id="givenStructureGivenSmilesErr" class="given-structure-given-smiles-err hidden" role="alert"></div>
+              </div>
+            </div>
+            <div id="givenStructureTableBlock" class="given-structure-table-block">
+              <p class="given-structure-sim-hint hint" data-i18n="givenStruct.simHint">相似度匹配结果（与上方 Given 对照；点「查看分子」在 Ketcher 中查看识别 SMILES，可与 Given 切换对比）</p>
+              <div id="givenStructureMainView" class="given-structure-main-view">
+                <div class="table-wrap">
+                  <table id="givenStructureTable" class="results-table">
+                    <thead><tr id="givenStructureThead"></tr></thead>
+                    <tbody id="givenStructureTbody"></tbody>
+                  </table>
+                </div>
+                <div id="givenStructurePaginationRow" class="activity-pagination-row hidden">
+                  <span id="givenStructurePaginationInfo" class="activity-pagination-info"></span>
+                  <div class="activity-pagination-btns">
+                    <button type="button" id="btnGivenStructureFirstPage" class="btn small" data-i18n="common.first">首页</button>
+                    <button type="button" id="btnGivenStructurePrevPage" class="btn small" data-i18n="common.prev">上一页</button>
+                    <button type="button" id="btnGivenStructureNextPage" class="btn small" data-i18n="common.next">下一页</button>
+                    <button type="button" id="btnGivenStructureLastPage" class="btn small" data-i18n="common.last">末页</button>
+                  </div>
+                </div>
+              </div>
+              <div id="givenStructureKetcherOverlay" class="given-structure-ketcher-overlay hidden" aria-hidden="true">
+                <div class="given-structure-ketcher-toolbar">
+                  <button type="button" id="btnGivenStructureKetcherBack" class="btn secondary" data-i18n="givenStruct.ketcherBack">返回「相似度结果表」</button>
+                  <p id="givenStructureKetcherHint" class="given-structure-ketcher-hint"></p>
+                </div>
+                <div class="given-structure-ketcher-controls">
+                  <input type="text" id="givenStructureKetcherSmilesInput" class="detection-ketcher-input" data-i18n-placeholder="givenStruct.smilesPh" data-i18n-aria="givenStruct.smilesAria" placeholder="识别的 SMILES（可编辑）" aria-label="识别的 SMILES" />
+                  <button type="button" id="btnGivenStructureKetcherDraw" class="btn small" data-i18n="givenStruct.draw">绘制</button>
+                  <button type="button" id="btnGivenStructureKetcherLoadGiven" class="btn small secondary" data-i18n="givenStruct.loadGiven">载入 Given 到 Ketcher</button>
+                </div>
+                <div class="ketcher-iframe-wrap given-structure-ketcher-iframe-wrap">
+                  <iframe id="givenStructureKetcherIframe" src="static/ketcher-standalone-3.7.0/standalone/index.html" data-i18n-title="givenStruct.ketcherIframeTitle" title="Ketcher 识别配体"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <!-- Sheet: 结果预览 -->
+      <div id="sheetResults" class="sheet-panel" role="tabpanel" aria-labelledby="sheetTabResults" data-sheet="results">
+      <section class="card">
+        <h2 data-i18n="results.title">结果预览</h2>
+        <div class="form-row auto-result-dir-row">
+          <label data-i18n="results.resultDir">结果目录（与上面输出目录一致后点“加载结果”）</label>
+          <div class="input-group">
+            <input type="text" id="resultsOutputDir" value="tmp_output/demo_ui" placeholder="tmp_output/demo_68_6r8r" />
+            <button type="button" id="btnLoadResults" class="btn primary" data-i18n="results.load">加载结果</button>
+          </div>
+        </div>
+        <div id="resultsSummary" class="results-summary hidden"></div>
+        <div id="resultsDocFilterRow" class="form-row markush-doc-page-row hidden">
+          <label data-i18n="results.doc">文档</label>
+          <div class="markush-selects">
+            <select id="resultsDocFilter">
+              <option value="" data-i18n="results.allDocs">全部</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="resultsTable" class="results-table">
+            <thead><tr id="resultsThead"></tr></thead>
+            <tbody id="resultsTbody"></tbody>
+          </table>
+          <p id="resultsTableEmptyHint" class="results-table-empty-hint" data-i18n="results.tableEmpty">暂无数据，请先运行推理并加载结果目录。</p>
+        </div>
+        <div id="resultsPaginationRow" class="activity-pagination-row hidden">
+          <span id="resultsPaginationInfo" class="activity-pagination-info"></span>
+          <div class="activity-pagination-btns">
+            <button type="button" id="btnResultsFirstPage" class="btn small" data-i18n="common.first">首页</button>
+            <button type="button" id="btnResultsPrevPage" class="btn small" data-i18n="common.prev">上一页</button>
+            <button type="button" id="btnResultsNextPage" class="btn small" data-i18n="common.next">下一页</button>
+            <button type="button" id="btnResultsLastPage" class="btn small" data-i18n="common.last">末页</button>
+          </div>
+        </div>
+      </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p data-i18n="footer.line">BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature</p>
+    </footer>
+  </div>
+  <script src="static/i18n.js"></script>
+  <script src="static/ketcher_bridge.js"></script>
+  <script src="static/app.js"></script>
+</body>
+</html>
