@@ -2,8 +2,8 @@
 # BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature
 
 ## Changelog
-- 2025/12/27 BioMiner Interactive User Interface (UI) Release
-    - Releasing interactive user interface for non-command deployment and better result analysis
+- 2025/12/27 [BioMiner Interactive User Interface (UI) Release](#interactive-user-interface)
+    - Releasing [interactive user interface](#interactive-user-interface) for non-command deployment and better result analysis
 
 - 2025/12/27 BioMiner Upgrade Version Release
     - **Biotriplet extraction F1 score increases to 0.32**
