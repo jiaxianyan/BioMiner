@@ -2,8 +2,7 @@
 
 <img src="visualization/logo.jpg" alt="BioMiner" width="220" />
 
-
-**A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature**
+<h2 align="center">A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature</h2>
 
 [![Version](https://img.shields.io/badge/version-1.0.0-0366d6?style=flat-square)](#changelog)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
