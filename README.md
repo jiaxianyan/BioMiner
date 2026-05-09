@@ -6,7 +6,8 @@
 
 [![Version](https://img.shields.io/badge/version-1.0.0-0366d6?style=flat-square)](#changelog)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Paper](https://img.shields.io/badge/paper-bioRxiv-red?style=flat-square)](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v2)
+[![Paper](https://img.shields.io/badge/paper-bioRxiv-red?style=flat-square)](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v3)
+[![arXiv](https://img.shields.io/badge/arXiv-2604.21508-B31B1B?style=flat-square)](https://arxiv.org/abs/2604.21508)
 
 </div>
 
@@ -55,7 +56,7 @@
 
 
 ## Introduction
-This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v2).
+This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://arxiv.org/abs/2604.21508).
 If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
 
 - We introduce **BioMiner**, a multi-modal system integrating multi-modal large language models (MLLMs), domain-specific models (DSMs), and domain tools (DTs) to automatically extract protein-ligand-bioactivity triplets from thousands to potentially millions of publications at high throughput (about 20 seconds/paper on 4 A800 80G GPUs). 
@@ -107,15 +108,20 @@ Downloading BioVista according to the following links, and unzip them in the `./
 |  Markush Enumeration | F1, Precision, Recall | 355 Augmented Images | 3,513 Markush Scaffold-R Group-Coreference Pairs | [Link](https://drive.google.com/file/d/19WrleiHQY6v6srZEWlKvl-uPlx0wiaLa/view?usp=drive_link) | 
 
 ## Statistics and Access of BioMiner Constructed Database
-With BioMiner, we construct three databases, namely the EJMC bioactivity database, NLRP3 bioactivity database, and PoseBuster structure-bioactivity database.
+With BioMiner, we construct three databases, namely the EJMC bioactivity database, NLRP3 bioactivity database, and PoseBusters structure-bioactivity database.
 
 You can directly download them for your own use.
 
 | **Database**    | **Workflow** | **Data Points** | **Download** |
 | ----------- | ----------- | ----------- | ----------- | 
-|  EJMC | Fully Automated | 67,953 bioactivity data  | [Link](https://drive.google.com/file/d/1fSdBI_ARkQ80oi3eyboX7nq45LlbaP5o/view?usp=drive_link) | 
+|  EJMC | Fully Automated | 82,262 bioactivity data  | [Link](https://drive.google.com/file/d/1fSdBI_ARkQ80oi3eyboX7nq45LlbaP5o/view?usp=drive_link) | 
+<<<<<<< HEAD
 |  NLRP3 | Human-in-the-loop | 1,598 NLRP3 bioactivity data | [Link](https://drive.google.com/file/d/1h3lQ6cHiG_M4HPMVi7FpYuPmywhAXgID/view?usp=drive_link) | 
 |  PoseBuster | Human-in-the-loop | 242 structure-bioactivity pairs  | [Link](https://drive.google.com/file/d/1LLaoxrTt61fWoPtBE1UMMhHhUy0XP0nY/view?usp=drive_link) | 
+=======
+|  NLRP3 | Human-in-the-loop | 1,592 NLRP3 bioactivity data | [Link](https://drive.google.com/file/d/1h3lQ6cHiG_M4HPMVi7FpYuPmywhAXgID/view?usp=drive_link) | 
+|  PoseBusters | Human-in-the-loop | 242 structure-bioactivity pairs  | [Link](https://drive.google.com/file/d/1LLaoxrTt61fWoPtBE1UMMhHhUy0XP0nY/view?usp=drive_link) | 
+>>>>>>> 5d0ac6699cf939462572177449ff330b11b3688e
 
 
 ## Installation of BioMiner
