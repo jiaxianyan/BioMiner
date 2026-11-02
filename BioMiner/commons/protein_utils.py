@@ -1,4 +1,6 @@
 
+import shutil
+import subprocess
 import requests
 import json
 import os 
@@ -121,8 +123,8 @@ def pdb_structure_based_on_uniprot_id(uniprot_id):
         os.makedirs(f'./pdb/{uniprot_id}')
 
     if not os.path.exists(save_path):
-        os.system(f'wget https://files.rcsb.org/download/{pdb_id}.pdb')
-        os.system(f'mv {pdb_id}.pdb {save_path}')
+        subprocess.run(['wget', f'https://files.rcsb.org/download/{pdb_id}.pdb'])
+        shutil.move(f'{pdb_id}.pdb', save_path)
     
     if not os.path.exists(save_path):
         return None
@@ -137,8 +139,8 @@ def pdb_structure_based_on_pdb(pdb_id):
         os.makedirs(f'./pdb/{pdb_id}')
 
     if not os.path.exists(save_path):
-        os.system(f'wget https://files.rcsb.org/download/{pdb_id}.pdb')
-        os.system(f'mv {pdb_id}.pdb {save_path}')
+        subprocess.run(['wget', f'https://files.rcsb.org/download/{pdb_id}.pdb'])
+        shutil.move(f'{pdb_id}.pdb', save_path)
     
     if not os.path.exists(save_path):
         return None
@@ -236,7 +238,7 @@ def get_structure_based_on_name_ttd(protein_name):
     print(pdb_id)
 
     if not os.path.exists(f'{pdb_id}.pdb'):
-        os.system(f'wget https://files.rcsb.org/download/{pdb_id}.pdb')
+        subprocess.run(['wget', f'https://files.rcsb.org/download/{pdb_id}.pdb'])
 
     # get alphafold-db structure based on uniprot id 
 
