@@ -8,11 +8,14 @@
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Paper](https://img.shields.io/badge/paper-bioRxiv-red?style=flat-square)](https://www.biorxiv.org/content/10.1101/2025.04.22.648951v3)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.21508-B31B1B?style=flat-square)](https://arxiv.org/abs/2604.21508)
+[![Nature Communications](https://img.shields.io/badge/Nature%20Communications-Accepted-brightgreen?style=flat-square)](#citation)
 
 </div>
 
 
 ## Changelog
+- 2026/11/10 🎉 **BioMiner has been accepted by *Nature Communications*!**
+
 - 2026/4/3 [BioMiner Interactive User Interface (UI) Release](#interactive-user-interface)
     - Releasing [interactive user interface](#interactive-user-interface) for non-command deployment and better result analysis
 
@@ -56,7 +59,7 @@
 
 
 ## Introduction
-This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://arxiv.org/abs/2604.21508).
+This is the official implement for paper [BioMiner: A Multi-modal System for Automated Mining of Protein-Ligand Bioactivity Data from Literature](https://arxiv.org/abs/2604.21508), which has been accepted by ***Nature Communications***.
 If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
 
 - We introduce **BioMiner**, a multi-modal system integrating multi-modal large language models (MLLMs), domain-specific models (DSMs), and domain tools (DTs) to automatically extract protein-ligand-bioactivity triplets from thousands to potentially millions of publications at high throughput (about 20 seconds/paper on 4 A800 80G GPUs). 
@@ -381,7 +384,7 @@ If you encounter any issues, please reach out to jiaxianyan@mail.ustc.edu.cn.
 This project is licensed under the terms of the MIT license. See [LICENSE](LICENSE) for additional details.
 
 ## Citation
-If you find our work helpful, please kindly cite:
+If you find our work helpful, please kindly cite (our paper has been accepted by *Nature Communications*; the citation will be updated once it is published):
 ```
 @article {Yan2025.04.22.648951,
 	author = {Yan, Jiaxian and Zhu, Jintao and Yang, Yuhang and Liu, Qi and Zhang, Kai and Zhang, Zaixi and Liu, Xukai and Zhang, Boyan and Gao, Kaiyuan and Xiao, Jinchuan and Chen, Enhong},
